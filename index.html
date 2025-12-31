@@ -1220,9 +1220,48 @@
         }, 500);
     }
 
+    // ===== TEST MODE TOGGLE =====
+    // Set to true for testing, false for production
+    const TEST_MODE = true;
+
     // Countdown to New Year 2026 (January 1, 2026 00:00:00 IST)
-    const countdownDate = new Date("2026-01-01T00:00:00+05:30").getTime();
-    const jan2Date = new Date("2026-01-02T00:00:00+05:30").getTime();
+    let countdownDate, jan2Date;
+
+    if (TEST_MODE) {
+        // TEST MODE: Quick demo of all three phases
+        // Phase 1: Countdown (60 seconds)
+        countdownDate = new Date(Date.now() + 60000).getTime(); // 1 minute from now
+        // Phase 2: Celebration (30 seconds after countdown ends)
+        jan2Date = new Date(countdownDate + 30000).getTime(); // 30 seconds celebration
+        console.log("🧪 TEST MODE ACTIVE - Timeline:");
+        console.log("   ⏳ Countdown ends in: 60 seconds");
+        console.log("   🎉 Celebration mode: 30 seconds (from 1:00 to 1:30)");
+        console.log("   ⏱️  Count-up mode starts: after 1:30");
+
+        // Show test mode indicator
+        const testBadge = document.createElement('div');
+        testBadge.style.cssText = `
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 165, 0, 0.95);
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            z-index: 10001;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+            pointer-events: none;
+            letter-spacing: 1px;
+        `;
+        testBadge.innerHTML = '🧪 TEST MODE';
+        document.body.appendChild(testBadge);
+    } else {
+        // PRODUCTION MODE: Real New Year dates
+        countdownDate = new Date("2026-01-01T00:00:00+05:30").getTime();
+        jan2Date = new Date("2026-01-02T00:00:00+05:30").getTime();
+    }
 
     function timer() {
         const now = Date.now();
