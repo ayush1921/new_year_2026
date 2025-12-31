@@ -1222,27 +1222,59 @@
 
     // Countdown to New Year 2026 (January 1, 2026 00:00:00 IST)
     const countdownDate = new Date("2026-01-01T00:00:00+05:30").getTime();
+    const jan2Date = new Date("2026-01-02T00:00:00+05:30").getTime();
 
     function timer() {
-        const diff = countdownDate - Date.now();
-        if (diff <= 0) {
+        const now = Date.now();
+        const diff = countdownDate - now;
+
+        // BEFORE NEW YEAR: Countdown mode
+        if (diff > 0) {
+            const hours = Math.floor((diff/1000/60/60)%24);
+            const minutes = Math.floor((diff/1000/60)%60);
+            const seconds = Math.floor((diff/1000)%60);
+
+            document.getElementById('h').innerText = String(hours).padStart(2,'0');
+            document.getElementById('m').innerText = String(minutes).padStart(2,'0');
+            document.getElementById('s').innerText = String(seconds).padStart(2,'0');
+            return;
+        }
+
+        // JAN 1, 2026: Celebration mode (show HAPPY 2026 for 24 hours)
+        if (now < jan2Date) {
             if (!celebrationTriggered) {
                 celebrationTriggered = true;
                 document.getElementById('main-year').innerText = "HAPPY 2026";
                 document.getElementById('sub-tag').innerText = "LIMITLESS ERA BEGINS";
 
-                // Epic celebration - the ff.html fireworks library will automatically handle this
-                // Just trigger the visual changes, fireworks are automatic
+                // Show celebration message, keep timer at 00:00:00
+                document.getElementById('h').innerText = "00";
+                document.getElementById('m').innerText = "00";
+                document.getElementById('s').innerText = "00";
             }
-            document.getElementById('h').innerText = "00";
-            document.getElementById('m').innerText = "00";
-            document.getElementById('s').innerText = "00";
             return;
         }
-        const hours = Math.floor((diff/1000/60/60)%24);
-        const minutes = Math.floor((diff/1000/60)%60);
-        const seconds = Math.floor((diff/1000)%60);
 
+        // AFTER JAN 2, 2026: Count UP mode (show elapsed time since New Year)
+        const elapsed = now - countdownDate;
+        const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((elapsed / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
+        const seconds = Math.floor((elapsed / 1000) % 60);
+
+        // Update header text to show we're in 2026
+        if (document.getElementById('main-year').innerText !== "2026") {
+            document.getElementById('main-year').innerText = "2026";
+        }
+
+        // Update subtitle to show days elapsed
+        const subTag = document.getElementById('sub-tag');
+        const daysText = days === 1 ? "DAY 1 INTO THE FUTURE" : `DAY ${days} INTO THE FUTURE`;
+        if (subTag.innerText !== daysText) {
+            subTag.innerText = daysText;
+        }
+
+        // Show elapsed time (hours, minutes, seconds of current day)
         document.getElementById('h').innerText = String(hours).padStart(2,'0');
         document.getElementById('m').innerText = String(minutes).padStart(2,'0');
         document.getElementById('s').innerText = String(seconds).padStart(2,'0');
