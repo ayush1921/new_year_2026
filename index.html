@@ -265,6 +265,193 @@
         .share-btn:active {
             transform: translateY(-1px);
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 5% auto;
+            padding: 40px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 50px rgba(255, 215, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            color: #ffd700;
+            float: right;
+            font-size: 35px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #ffed4e;
+            transform: rotate(90deg);
+        }
+
+        .modal-content h2 {
+            color: #ffd700;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #d4af37;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #0a0a1f;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .preview-btn {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+        }
+
+        .link-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: stretch;
+        }
+
+        .link-box input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+            color: #ffd700;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            padding: 12px 25px;
+            background: #ffd700;
+            color: #0a0a1f;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #ffed4e;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 30px 20px;
+                margin: 10% auto;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .share-btn {
+                margin-left: 0 !important;
+                margin-top: 10px;
+            }
+
+            .link-box {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -313,23 +500,46 @@
 
         <!-- Wishes Section -->
         <div class="wishes">
-            <p>
-                As we bid farewell to 2025 and welcome <span class="wishes-highlight">2026</span>,
-                may this new year bring you endless joy, prosperity, and success!
-            </p>
-            <p>
-                May your dreams take flight, your goals be achieved, and every moment
-                be filled with <span class="wishes-highlight">love, laughter, and light</span>.
-            </p>
-            <p>
-                Here's to new adventures, cherished memories, and a year of
-                <span class="wishes-highlight">infinite possibilities</span>!
-            </p>
+            <div id="custom-wish-header" style="display: none; margin-bottom: 20px;">
+                <p style="font-size: 1.2rem; color: #ffd700;">
+                    Dear <span class="wishes-highlight" id="to-name-display"></span>,
+                </p>
+            </div>
+
+            <div id="default-wishes">
+                <p>
+                    As we bid farewell to 2025 and welcome <span class="wishes-highlight">2026</span>,
+                    may this new year bring you endless joy, prosperity, and success!
+                </p>
+                <p>
+                    May your dreams take flight, your goals be achieved, and every moment
+                    be filled with <span class="wishes-highlight">love, laughter, and light</span>.
+                </p>
+                <p>
+                    Here's to new adventures, cherished memories, and a year of
+                    <span class="wishes-highlight">infinite possibilities</span>!
+                </p>
+            </div>
+
+            <div id="custom-message-display" style="display: none;">
+                <p style="font-size: 1.2rem; line-height: 1.8;"></p>
+            </div>
+
             <p style="margin-top: 25px; font-size: 1.5rem; color: #ffd700;">
                 Happy New Year 2026!
             </p>
 
-            <button class="share-btn" onclick="shareWishes()">Share Your Wishes</button>
+            <div id="from-name-display" style="display: none; margin-top: 15px;">
+                <p style="font-size: 1.1rem; color: #d4af37; font-style: italic;">
+                    With warm wishes,<br>
+                    <span class="wishes-highlight" id="from-name-text"></span>
+                </p>
+            </div>
+
+            <div class="button-group" style="margin-top: 30px;">
+                <button class="share-btn" onclick="openCustomizeModal()">Customize & Share</button>
+                <button class="share-btn" onclick="shareWishes()" style="margin-left: 10px;">Quick Share</button>
+            </div>
         </div>
     </div>
 
@@ -338,15 +548,197 @@
         Click anywhere for confetti celebration!
     </div>
 
-    <!-- Audio Element -->
+    <!-- Audio Elements -->
     <audio id="fireworks-audio" preload="auto">
         <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
     </audio>
+    <audio id="firework-burst-audio" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Customize Modal -->
+    <div id="customize-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeCustomizeModal()">&times;</span>
+            <h2>🎨 Customize Your New Year Wishes</h2>
+            <div class="form-group">
+                <label>From (Your Name):</label>
+                <input type="text" id="from-name" placeholder="Enter your name" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>To (Recipient's Name):</label>
+                <input type="text" id="to-name" placeholder="Enter recipient's name" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label>Custom Message:</label>
+                <textarea id="custom-message" placeholder="Enter your personalized New Year message..." rows="4" maxlength="300"></textarea>
+            </div>
+            <div class="button-group">
+                <button class="modal-btn preview-btn" onclick="previewCustomization()">Preview</button>
+                <button class="modal-btn generate-btn" onclick="generateShareableLink()">Generate Link</button>
+            </div>
+            <div id="shareable-link-container" style="display: none;">
+                <p style="color: #ffd700; margin-top: 20px;">Your shareable link:</p>
+                <div class="link-box">
+                    <input type="text" id="shareable-link" readonly>
+                    <button class="copy-btn" onclick="copyShareableLink()">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ==================== CONFIGURATION ====================
         const targetDate = new Date('2026-01-01T00:00:00+05:30').getTime(); // IST timezone
         let celebrationTriggered = false;
+        let audioEnabled = false;
+        let customWishData = {
+            from: '',
+            to: '',
+            message: '',
+            code: ''
+        };
+
+        // ==================== URL PARAMETER PARSING ====================
+        function parseURLParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (code) {
+                // Decode the custom wish data from the code
+                try {
+                    const decoded = atob(code);
+                    const data = JSON.parse(decoded);
+                    customWishData = data;
+                    displayCustomWish();
+                } catch (e) {
+                    console.log('Invalid code format');
+                }
+            }
+        }
+
+        function displayCustomWish() {
+            if (customWishData.to) {
+                document.getElementById('custom-wish-header').style.display = 'block';
+                document.getElementById('to-name-display').textContent = customWishData.to;
+            }
+
+            if (customWishData.message) {
+                document.getElementById('default-wishes').style.display = 'none';
+                document.getElementById('custom-message-display').style.display = 'block';
+                document.getElementById('custom-message-display').querySelector('p').textContent = customWishData.message;
+            }
+
+            if (customWishData.from) {
+                document.getElementById('from-name-display').style.display = 'block';
+                document.getElementById('from-name-text').textContent = customWishData.from;
+            }
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
+        function openCustomizeModal() {
+            document.getElementById('customize-modal').style.display = 'block';
+            // Pre-fill if data exists
+            if (customWishData.from) document.getElementById('from-name').value = customWishData.from;
+            if (customWishData.to) document.getElementById('to-name').value = customWishData.to;
+            if (customWishData.message) document.getElementById('custom-message').value = customWishData.message;
+        }
+
+        function closeCustomizeModal() {
+            document.getElementById('customize-modal').style.display = 'none';
+            document.getElementById('shareable-link-container').style.display = 'none';
+        }
+
+        function previewCustomization() {
+            const fromName = document.getElementById('from-name').value.trim();
+            const toName = document.getElementById('to-name').value.trim();
+            const message = document.getElementById('custom-message').value.trim();
+
+            if (!fromName && !toName && !message) {
+                alert('Please fill in at least one field to preview!');
+                return;
+            }
+
+            customWishData = {
+                from: fromName,
+                to: toName,
+                message: message,
+                code: ''
+            };
+
+            displayCustomWish();
+            closeCustomizeModal();
+
+            // Trigger confetti for preview
+            randomConfetti();
+        }
+
+        function generateShareableLink() {
+            const fromName = document.getElementById('from-name').value.trim();
+            const toName = document.getElementById('to-name').value.trim();
+            const message = document.getElementById('custom-message').value.trim();
+
+            if (!fromName && !toName && !message) {
+                alert('Please fill in at least one field to generate a link!');
+                return;
+            }
+
+            // Create unique code
+            const data = {
+                from: fromName,
+                to: toName,
+                message: message,
+                timestamp: Date.now()
+            };
+
+            const encoded = btoa(JSON.stringify(data));
+            const baseURL = window.location.origin + window.location.pathname;
+            const shareableLink = `${baseURL}?code=${encoded}`;
+
+            // Display the link
+            document.getElementById('shareable-link').value = shareableLink;
+            document.getElementById('shareable-link-container').style.display = 'block';
+
+            // Update local data
+            customWishData = { ...data, code: encoded };
+        }
+
+        function copyShareableLink() {
+            const linkInput = document.getElementById('shareable-link');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999); // For mobile
+
+            navigator.clipboard.writeText(linkInput.value).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.style.background = '#4ecdc4';
+
+                // Trigger confetti
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ffd700', '#ffed4e', '#4ecdc4'],
+                    zIndex: 10001
+                });
+
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '#ffd700';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy link. Please copy manually.');
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('customize-modal');
+            if (event.target == modal) {
+                closeCustomizeModal();
+            }
+        }
 
         // ==================== COUNTDOWN TIMER ====================
         function updateCountdown() {
@@ -459,6 +851,7 @@
         // ==================== AUDIO ====================
         function playFireworksSound() {
             const audio = document.getElementById('fireworks-audio');
+            audio.volume = 0.5;
 
             // Try to play
             const playPromise = audio.play();
@@ -466,14 +859,37 @@
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     console.log('Audio playing successfully');
+                    audioEnabled = true;
                 }).catch(error => {
                     console.log('Auto-play prevented. User interaction required.');
                     // Add click listener to play on next interaction
                     document.addEventListener('click', function playOnClick() {
-                        audio.play();
+                        audio.play().then(() => {
+                            audioEnabled = true;
+                        });
                         document.removeEventListener('click', playOnClick);
                     }, { once: true });
                 });
+            }
+        }
+
+        // Enable audio on first user interaction
+        function enableAudioOnInteraction() {
+            if (!audioEnabled) {
+                const audio = document.getElementById('fireworks-audio');
+                const burstAudio = document.getElementById('firework-burst-audio');
+
+                // Prime both audio elements
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audioEnabled = true;
+                }).catch(e => console.log('Audio initialization failed:', e));
+
+                burstAudio.play().then(() => {
+                    burstAudio.pause();
+                    burstAudio.currentTime = 0;
+                }).catch(e => console.log('Burst audio initialization failed:', e));
             }
         }
 
@@ -658,6 +1074,14 @@
             while (particleCount--) {
                 particles.push(new Particle(x, y, hue));
             }
+
+            // Play firework burst sound
+            if (audioEnabled) {
+                const burstAudio = document.getElementById('firework-burst-audio');
+                burstAudio.currentTime = 0;
+                burstAudio.volume = 0.3; // Lower volume for frequent bursts
+                burstAudio.play().catch(e => console.log('Burst audio play failed:', e));
+            }
         }
 
         function createMassiveFireworksBurst() {
@@ -712,6 +1136,14 @@
 
         // ==================== CLICK INTERACTION ====================
         document.addEventListener('click', function(e) {
+            // Enable audio on first click
+            enableAudioOnInteraction();
+
+            // Don't trigger if clicking on modal
+            if (e.target.closest('.modal-content') || e.target.closest('.share-btn')) {
+                return;
+            }
+
             // Trigger confetti at click location
             const x = e.clientX / window.innerWidth;
             const y = e.clientY / window.innerHeight;
@@ -731,16 +1163,22 @@
                 e.clientX,
                 e.clientY
             ));
-
-            // Play sound
-            const audio = document.getElementById('fireworks-audio');
-            audio.currentTime = 0;
-            audio.play().catch(e => console.log('Audio play failed:', e));
         });
 
         // ==================== SHARE FUNCTIONALITY ====================
         function shareWishes() {
-            const shareText = `🎊 Happy New Year 2026! 🎊\n\nWishing you a year filled with joy, success, and endless possibilities!\n\nCheck out the countdown: ${window.location.href}`;
+            let shareText = `🎊 Happy New Year 2026! 🎊\n\n`;
+
+            if (customWishData.message) {
+                shareText += `${customWishData.message}\n\n`;
+                if (customWishData.from) {
+                    shareText += `- ${customWishData.from}\n\n`;
+                }
+            } else {
+                shareText += `Wishing you a year filled with joy, success, and endless possibilities!\n\n`;
+            }
+
+            shareText += `Check out the countdown: ${window.location.href}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -752,6 +1190,15 @@
                 // Fallback: Copy to clipboard
                 navigator.clipboard.writeText(shareText).then(() => {
                     alert('Wishes copied to clipboard! Share them with your loved ones! 🎉');
+
+                    // Trigger confetti
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#ffd700', '#ffed4e', '#4ecdc4'],
+                        zIndex: 1000
+                    });
                 }).catch(err => {
                     console.log('Could not copy text:', err);
                     alert('Share this page with your friends and family!');
@@ -760,14 +1207,13 @@
         }
 
         // ==================== INITIALIZATION ====================
+        // Parse URL parameters on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            parseURLParameters();
+        });
+
         // Try to enable audio on first user interaction
-        document.addEventListener('click', function enableAudio() {
-            const audio = document.getElementById('fireworks-audio');
-            audio.play().then(() => {
-                audio.pause();
-                audio.currentTime = 0;
-            }).catch(e => console.log('Audio initialization failed:', e));
-        }, { once: true });
+        document.addEventListener('click', enableAudioOnInteraction, { once: true });
     </script>
 </body>
 </html>
