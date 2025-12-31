@@ -10,25 +10,51 @@
 
         :root {
             /* Cyber Theme (Default) */
-            --bg: #010103;
+            --bg: linear-gradient(135deg, #010103 0%, #1a0520 50%, #010103 100%);
             --primary: #00f2ff;
             --accent: #ff007a;
             --glass: rgba(255, 255, 255, 0.05);
             --font: 'Space Grotesk', sans-serif;
         }
 
-        [data-theme="royal"] { --bg: #050400; --primary: #ffd700; --accent: #ffffff; }
-        [data-theme="cosmic"] { --bg: #020008; --primary: #9d00ff; --accent: #00ffaa; }
+        [data-theme="royal"] {
+            --bg: linear-gradient(135deg, #0a0500 0%, #1a0f00 50%, #0a0500 100%);
+            --primary: #ffd700;
+            --accent: #ffffff;
+        }
+        [data-theme="cosmic"] {
+            --bg: linear-gradient(135deg, #020008 0%, #0f001a 50%, #020008 100%);
+            --primary: #9d00ff;
+            --accent: #00ffaa;
+        }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        body { 
-            background: var(--bg); 
-            color: #fff; 
-            overflow: hidden; 
-            height: 100vh; 
+        body {
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
             font-family: var(--font);
-            transition: background 1.5s ease;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: -10;
+            transition: background 2s ease;
+            animation: bgPulse 20s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
 
         canvas { position: fixed; top: 0; left: 0; z-index: 1; cursor: crosshair; }
@@ -37,36 +63,114 @@
         .ui { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; text-align: center; padding: 20px; }
         
         .header { margin-bottom: 2rem; }
-        .year { 
-            font-size: clamp(5rem, 22vw, 11rem); 
-            font-weight: 700; 
-            letter-spacing: -6px; 
-            color: var(--primary); 
+        .year {
+            font-size: clamp(5rem, 22vw, 11rem);
+            font-weight: 700;
+            letter-spacing: -6px;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--primary));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             line-height: 0.8;
-            filter: drop-shadow(0 0 30px var(--primary));
+            filter: drop-shadow(0 0 40px var(--primary)) drop-shadow(0 0 80px var(--accent));
             transition: 0.5s ease;
+            animation: gradientFlow 4s ease infinite, yearPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes yearPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
         }
 
         .timer-grid { display: flex; gap: 12px; pointer-events: auto; flex-wrap: wrap; justify-content: center; }
-        .box { 
-            background: var(--glass); 
-            backdrop-filter: blur(20px); 
+        .box {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1); 
-            padding: 20px 10px; 
-            border-radius: 22px; 
+            border: 2px solid rgba(255,255,255,0.15);
+            padding: 20px 10px;
+            border-radius: 22px;
             min-width: clamp(80px, 25vw, 110px);
-            transition: 0.3s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .box:hover { border-color: var(--primary); transform: translateY(-5px); }
+
+        .box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+
+        .box:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 10px 40px rgba(0,242,255,0.3);
+        }
+
+        .box:hover::before {
+            left: 100%;
+        }
         .box .val { display: block; font-size: 2.8rem; font-weight: 700; color: #fff; }
         .box .lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; }
 
         /* Control Panel */
         .top-ctrl { position: fixed; top: 25px; left: 25px; display: flex; flex-direction: column; gap: 15px; pointer-events: auto; z-index: 100; }
-        .ctrl-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); transition: 0.3s; color: white; }
-        .ctrl-btn:hover { border-color: var(--primary); box-shadow: 0 0 15px var(--primary); }
-        .ctrl-btn:active { transform: scale(0.9); }
+        .ctrl-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ctrl-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .ctrl-btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary), inset 0 0 20px rgba(0,242,255,0.2);
+            transform: scale(1.1);
+        }
+
+        .ctrl-btn:hover::after {
+            opacity: 0.2;
+            background: var(--primary);
+        }
+
+        .ctrl-btn:active {
+            transform: scale(0.95);
+        }
 
         .btn-share {
             position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
@@ -94,19 +198,71 @@
         }
         textarea:focus { border-color: var(--primary); }
         
-        #vibe-pill { margin-top: 30px; padding: 10px 20px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--primary); display: none; font-weight: 300; italic; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        #vibe-pill {
+            margin-top: 30px;
+            padding: 12px 25px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border: 2px solid var(--primary);
+            display: none;
+            font-weight: 400;
+            font-style: italic;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 5px 25px rgba(0,242,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
 
-        .mute-active { opacity: 0.4; }
+        .mute-active { opacity: 0.4; filter: grayscale(1); }
+
+        /* Particle stars in background */
+        .star {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Glowing orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.15;
+            z-index: 0;
+            animation: orbFloat 15s ease-in-out infinite;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(50px, -50px); }
+            66% { transform: translate(-50px, 50px); }
+        }
     </style>
 </head>
 <body data-theme="cyber">
 
+    <!-- Background orbs -->
+    <div class="orb" style="width: 300px; height: 300px; background: #00f2ff; top: 10%; left: 10%;"></div>
+    <div class="orb" style="width: 400px; height: 400px; background: #ff007a; top: 60%; right: 15%;"></div>
+    <div class="orb" style="width: 250px; height: 250px; background: #9d00ff; bottom: 20%; left: 50%;"></div>
+
     <div class="top-ctrl">
-        <div class="ctrl-btn" style="background: #00f2ff;" onclick="setTheme('cyber')"></div>
-        <div class="ctrl-btn" style="background: #ffd700;" onclick="setTheme('royal')"></div>
-        <div class="ctrl-btn" style="background: #9d00ff;" onclick="setTheme('cosmic')"></div>
-        <div class="ctrl-btn" id="mute-trigger" onclick="toggleMute()">🔊</div>
+        <div class="ctrl-btn" style="background: linear-gradient(135deg, #00f2ff, #007a99);" onclick="setTheme('cyber')" title="Cyber"></div>
+        <div class="ctrl-btn" style="background: linear-gradient(135deg, #ffd700, #aa8800);" onclick="setTheme('royal')" title="Royal"></div>
+        <div class="ctrl-btn" style="background: linear-gradient(135deg, #9d00ff, #5500aa);" onclick="setTheme('cosmic')" title="Cosmic"></div>
+        <div class="ctrl-btn" id="mute-trigger" onclick="toggleMute()" title="Toggle Sound">🔊</div>
     </div>
 
     <canvas id="stage"></canvas>
@@ -114,7 +270,7 @@
     <div class="ui">
         <div class="header">
             <h1 class="year" id="main-year">2026</h1>
-            <p id="sub-tag" style="opacity: 0.5; letter-spacing: 5px; margin-top: 10px; font-size: 0.75rem;">GENESIS IMMINENT</p>
+            <p id="sub-tag" style="opacity: 0.7; letter-spacing: 5px; margin-top: 10px; font-size: 0.75rem; color: var(--primary); text-shadow: 0 0 10px var(--primary);">GENESIS IMMINENT</p>
         </div>
 
         <div class="timer-grid">
@@ -140,52 +296,18 @@
 
 <script>
     // --- 1. SOUND ENGINE ---
-    // Softer, more pleasant sound alternatives
-    const sndWhoosh = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3'); // Gentler whoosh
-    const sndBurst  = new Audio('https://assets.mixkit.co/active_storage/sfx/1646/1646-preview.mp3'); // Magical sparkle
-    const sndPad    = new Audio('https://assets.mixkit.co/active_storage/sfx/2906/2906-preview.mp3'); // Ambient ethereal pad
-    const sndChime  = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); // Soft celebration chime
-
-    sndPad.loop = true;
-    sndPad.volume = 0.15;  // Reduced for subtlety
-    sndWhoosh.volume = 0.08;  // Much softer
-    sndBurst.volume  = 0.1;   // Softer burst
-    sndChime.volume  = 0.12;
-
     let isMuted = false;
     let audioStarted = false;
-    let lastSoundTime = 0;
-
-    function playFireworkSound(force = false) {
-        if (isMuted || !audioStarted) return;
-        const now = Date.now();
-        if (!force && now - lastSoundTime < 200) return;  // Longer delay between sounds
-        if (!force && Math.random() < 0.4) return; // More selective (less frequent)
-
-        lastSoundTime = now;
-        sndWhoosh.playbackRate = 0.9 + Math.random() * 0.3;  // Less pitch variation
-        sndBurst.playbackRate  = 0.95 + Math.random() * 0.15;
-
-        const w = sndWhoosh.cloneNode();
-        const b = sndBurst.cloneNode();
-        w.volume = 0.08;  // Softer volumes
-        b.volume = 0.1;
-
-        w.play();
-        setTimeout(() => b.play(), 80 + Math.random() * 60);  // Slightly longer delay for smoother effect
-    }
 
     function toggleMute() {
         isMuted = !isMuted;
         document.getElementById('mute-trigger').innerText = isMuted ? '🔇' : '🔊';
         document.getElementById('mute-trigger').classList.toggle('mute-active', isMuted);
-        if (isMuted) sndPad.pause(); else if(audioStarted) sndPad.play();
     }
 
     function startAudioContext() {
         if (!audioStarted) {
             audioStarted = true;
-            sndPad.play();
         }
     }
 
@@ -244,16 +366,15 @@
 
     function createBurst(x, y, isAuto = false) {
         if (!audioStarted) return;
-        playFireworkSound(!isAuto);
         const palette = palettes[currentTheme];
         const color = palette[Math.floor(Math.random() * palette.length)];
-        const count = isAuto ? 50 : 80;  // More particles for manual clicks
-        const maxVelocity = isAuto ? 7 : 10;
+        const count = isAuto ? 60 : 100;  // More particles for manual clicks
+        const maxVelocity = isAuto ? 8 : 12;
 
         for (let i = 0; i < count; i++) {
             const angle = Math.random() * Math.PI * 2;
             const velocity = Math.random() * maxVelocity;
-            const size = 1 + Math.random() * 1.5;  // Variable sizes
+            const size = 1 + Math.random() * 2;  // Variable sizes
             particles.push(new Particle(x, y, color, Math.cos(angle) * velocity, Math.sin(angle) * velocity, 0.015, size));
         }
     }
@@ -286,6 +407,11 @@
 
     canvas.width = innerWidth; canvas.height = innerHeight;
     loop();
+
+    // Load external fireworks library with sound from ff.html
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/cdn25/fireworks/v.2.1.js';
+    document.body.appendChild(script);
 
     // --- 4. DATA LOGIC ---
     function openDrawer() { document.getElementById('drawer').style.display = 'flex'; }
@@ -349,21 +475,27 @@
                 document.getElementById('main-year').innerText = "HAPPY 2026";
                 document.getElementById('sub-tag').innerText = "LIMITLESS ERA BEGINS";
 
-                // Epic celebration sequence
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: palettes[currentTheme] });
-                setTimeout(() => confetti({ particleCount: 100, spread: 90, origin: { y: 0.7 }, colors: palettes[currentTheme] }), 300);
-                setTimeout(() => confetti({ particleCount: 120, spread: 60, origin: { y: 0.5 }, colors: palettes[currentTheme] }), 600);
+                // Epic celebration sequence with theme colors
+                const colors = palettes[currentTheme];
 
-                // Play celebration chime
-                if (!isMuted && audioStarted) {
-                    sndChime.play();
+                // Multiple confetti bursts
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        confetti({
+                            particleCount: 100,
+                            spread: 100,
+                            origin: { x: Math.random(), y: 0.6 },
+                            colors: colors,
+                            startVelocity: 50
+                        });
+                    }, i * 400);
                 }
 
                 // Massive firework burst
-                for (let i = 0; i < 8; i++) {
+                for (let i = 0; i < 12; i++) {
                     setTimeout(() => {
                         createBurst(Math.random() * canvas.width, Math.random() * canvas.height * 0.6, false);
-                    }, i * 250);
+                    }, i * 200);
                 }
             }
             document.getElementById('h').innerText = "00";
