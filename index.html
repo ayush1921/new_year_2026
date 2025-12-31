@@ -3,377 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>2026 | Genesis</title>
-    <!-- canvas-confetti for the final "big" moment -->
+    <title>2026 | Infinity Countdown</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
 
         :root {
+            /* Theme: Cyber (Default) */
+            --bg: #030008;
             --primary: #00f2ff;
-            --accent: #7000ff;
-            --text: #ffffff;
-            --card: rgba(255, 255, 255, 0.04);
-            --border: rgba(255, 255, 255, 0.1);
+            --secondary: #ff007a;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        /* Royal Theme */
+        [data-theme="royal"] {
+            --bg: #0a0800;
+            --primary: #ffd700;
+            --secondary: #ffffff;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #020205;
-            color: var(--text);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        /* Cosmic Theme */
+        [data-theme="cosmic"] {
+            --bg: #010114;
+            --primary: #9d00ff;
+            --secondary: #00ffaa;
         }
 
-        #canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            cursor: crosshair;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-        .interface {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            background: radial-gradient(circle at center, transparent 0%, #000 90%);
-        }
+        body { background: var(--bg); color: #fff; overflow: hidden; height: 100vh; transition: background 1s ease; }
 
-        .header {
-            margin-bottom: 5vh;
-            text-align: center;
-        }
+        canvas { position: fixed; top: 0; left: 0; z-index: 1; cursor: crosshair; }
 
-        .year {
-            font-size: clamp(5rem, 25vw, 9rem);
-            font-weight: 800;
-            letter-spacing: -6px;
-            background: linear-gradient(180deg, #fff 40%, rgba(255,255,255,0.1) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 0.8;
-            filter: drop-shadow(0 0 30px rgba(0, 242, 255, 0.3));
-        }
+        .ui { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; padding: 20px; text-align: center; }
 
-        .tagline {
-            font-size: 0.8rem;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            opacity: 0.6;
-            margin-top: 10px;
-        }
+        .theme-shifter { position: fixed; top: 20px; left: 20px; pointer-events: auto; display: flex; gap: 8px; z-index: 100; }
+        .t-btn { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; transition: transform 0.3s; }
+        .t-btn:active { transform: scale(0.8); }
 
-        .timer {
-            display: flex;
-            gap: 15px;
-            pointer-events: auto;
-        }
+        .hero { font-size: clamp(5rem, 25vw, 10rem); font-weight: 700; line-height: 0.8; letter-spacing: -4px; margin-bottom: 20px; filter: drop-shadow(0 0 20px var(--primary)); transition: color 0.5s; color: var(--primary); }
 
-        .box {
-            background: var(--card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 20px 10px;
-            width: clamp(80px, 25vw, 130px);
-            text-align: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .countdown-row { display: flex; gap: 10px; pointer-events: auto; }
+        .box { background: var(--glass); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px; min-width: 90px; }
+        .box .num { display: block; font-size: 2.5rem; font-weight: 700; color: #fff; }
+        .box .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
 
-        .box:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.08);
-        }
+        .vibe-pill { margin-top: 30px; background: rgba(255,255,255,0.07); padding: 12px 25px; border-radius: 100px; display: none; border: 1px solid var(--primary); animation: glowPulse 2s infinite alternate; }
+        @keyframes glowPulse { from { box-shadow: 0 0 5px var(--primary); } to { box-shadow: 0 0 20px var(--primary); } }
 
-        .val {
-            display: block;
-            font-size: 2.8rem;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-            color: var(--primary);
-            text-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
-        }
+        .tap-msg { position: fixed; bottom: 30px; opacity: 0.4; font-size: 0.7rem; letter-spacing: 4px; pointer-events: none; width: 100%; text-align: center; }
 
-        .label {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.5;
-            font-weight: 400;
-        }
-
-        .vibe-card {
-            margin-top: 30px;
-            background: linear-gradient(90deg, transparent, rgba(112,0,255,0.2), transparent);
-            padding: 15px;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 50px;
-            display: none;
-            text-align: center;
-        }
-
-        .action-btn {
-            position: absolute;
-            bottom: 40px;
-            pointer-events: auto;
-            background: #fff;
-            color: #000;
-            padding: 18px 35px;
-            border-radius: 100px;
-            font-weight: 800;
-            border: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            transition: 0.3s;
-        }
-
-        .action-btn:active { transform: scale(0.9); }
-
-        /* Modal Overlay */
-        .drawer {
-            position: fixed;
-            bottom: -100%;
-            left: 0;
-            width: 100%;
-            height: 50vh;
-            background: #08080a;
-            z-index: 100;
-            border-radius: 30px 30px 0 0;
-            border-top: 1px solid var(--primary);
-            padding: 30px;
-            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .drawer.active { bottom: 0; }
-
-        textarea {
-            width: 100%;
-            height: 100px;
-            background: #121216;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 15px;
-            color: white;
-            font-family: inherit;
-            font-size: 1rem;
-            margin: 15px 0;
-            outline: none;
-        }
-
-        textarea:focus { border-color: var(--primary); }
-
-        .big-text { font-weight: 800; font-size: 1.5rem; }
+        .btn-main { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); pointer-events: auto; padding: 15px 40px; border-radius: 50px; background: #fff; color: #000; font-weight: 700; border: none; cursor: pointer; text-transform: uppercase; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; display: none; align-items: center; justify-content: center; pointer-events: auto; }
+        .modal { background: #111; padding: 30px; border-radius: 30px; width: 90%; max-width: 400px; border: 1px solid var(--primary); }
+        textarea { width: 100%; height: 100px; background: #222; border: none; color: #fff; padding: 15px; border-radius: 15px; margin: 15px 0; outline: none; }
     </style>
 </head>
-<body>
+<body data-theme="cyber">
 
-<canvas id="canvas"></canvas>
-
-<div class="interface">
-    <div class="header">
-        <h1 class="year">2026</h1>
-        <p class="tagline" id="tag">System Operational</p>
+    <div class="theme-shifter">
+        <div class="t-btn" style="background: #00f2ff;" onclick="setTheme('cyber')"></div>
+        <div class="t-btn" style="background: #ffd700;" onclick="setTheme('royal')"></div>
+        <div class="t-btn" style="background: #9d00ff;" onclick="setTheme('cosmic')"></div>
     </div>
 
-    <div class="timer">
-        <div class="box">
-            <span class="val" id="h">00</span>
-            <span class="label">Hrs</span>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <div class="ui">
+        <h1 class="hero" id="year">2026</h1>
+        <div class="countdown-row">
+            <div class="box"><span class="num" id="h">00</span><span class="lbl">Hrs</span></div>
+            <div class="box"><span class="num" id="m">00</span><span class="lbl">Min</span></div>
+            <div class="box"><span class="num" id="s">00</span><span class="lbl">Sec</span></div>
         </div>
-        <div class="box">
-            <span class="val" id="m">00</span>
-            <span class="label">Min</span>
-        </div>
-        <div class="box">
-            <span class="val" id="s">00</span>
-            <span class="label">Sec</span>
-        </div>
+        <div class="vibe-pill" id="vibe-pill"><span id="vibe-text"></span></div>
     </div>
 
-    <div class="vibe-card" id="vibe-display">
-        <p id="vibe-text" style="font-weight: 200; italic;"></p>
+    <button class="btn-main" onclick="openShare()">Blast it Share ✨</button>
+    <div class="tap-msg" id="sound-hint">TAP TO UNLOCK AUDIO & IGNITE SKY</div>
+
+    <div class="overlay" id="overlay">
+        <div class="modal">
+            <h2>Personalize Wish</h2>
+            <textarea id="wish-input" placeholder="2026: Be fearless..."></textarea>
+            <button class="btn-main" style="position: static; transform: none; width: 100%;" onclick="genShareLink()">Copy Magic Link</button>
+            <p onclick="document.getElementById('overlay').style.display='none'" style="text-align: center; margin-top: 20px; opacity: 0.5; cursor: pointer;">Cancel</p>
+        </div>
     </div>
-
-    <button class="action-btn" id="main-btn" onclick="toggleDrawer()">Personalize ✦</button>
-</div>
-
-<div class="drawer" id="drawer">
-    <p class="big-text">Set Your Vibe</p>
-    <p style="font-size: 0.8rem; opacity: 0.5;">Enter a wish for 2026. This creates a custom link for friends.</p>
-    <textarea id="vibe-input" placeholder="e.g. Health, success, and clear skies!"></textarea>
-    <button class="action-btn" style="position: relative; bottom: 0; width: 100%;" onclick="share()">Generate Magic Link</button>
-</div>
 
 <script>
-    // --- 1. CORE PHYSICS ENGINE (FIREWORKS & STARS) ---
-    const canvas = document.getElementById('canvas');
+    // --- 1. ENGINE CONSTANTS ---
+    const canvas = document.getElementById('fireworksCanvas');
     const ctx = canvas.getContext('2d');
+    let theme = 'cyber';
     let particles = [];
-    let fireworks = [];
-    let stars = [];
+    let audioUnlocked = false;
 
-    class Star {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 1.5;
-            this.blink = Math.random() * 0.02;
-            this.opacity = Math.random();
-        }
-        draw() {
-            this.opacity += this.blink;
-            if (this.opacity > 1 || this.opacity < 0.2) this.blink *= -1;
-            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
+    // Sounds
+    const SndPop = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    SndPop.volume = 0.2;
+
+    const colorPalettes = {
+        cyber: ['#00f2ff', '#ff007a', '#ffffff', '#7000ff'],
+        royal: ['#ffd700', '#ffffff', '#ffeb3b', '#aa8022'],
+        cosmic: ['#9d00ff', '#00ffaa', '#ff00e6', '#2b00ff']
+    };
+
+    function setTheme(t) {
+        theme = t;
+        document.body.setAttribute('data-theme', t);
+        const p = colorPalettes[t];
+        document.documentElement.style.setProperty('--primary', p[0]);
     }
 
-    class FireworkParticle {
-        constructor(x, y, color) {
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            this.vx = (Math.random() - 0.5) * 8;
-            this.vy = (Math.random() - 0.5) * 8;
+    // --- 2. PHYSICS ENGINE ---
+    class Particle {
+        constructor(x, y, color, speedX, speedY, flare = false) {
+            this.x = x; this.y = y; this.color = color;
+            this.speedX = speedX; this.speedY = speedY;
             this.alpha = 1;
-            this.gravity = 0.05;
-        }
-        update() {
-            this.vx *= 0.98;
-            this.vy *= 0.98;
-            this.vy += this.gravity;
-            this.x += this.vx;
-            this.y += this.vy;
-            this.alpha -= 0.012;
+            this.friction = flare ? 0.95 : 0.96;
+            this.gravity = 0.12;
+            this.life = Math.random() * 0.5 + 0.5;
+            this.flare = flare;
         }
         draw() {
             ctx.globalAlpha = this.alpha;
             ctx.fillStyle = this.color;
             ctx.beginPath();
-            ctx.arc(this.x, this.y, 1.5, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, this.flare ? 2 : 1.2, 0, Math.PI * 2);
             ctx.fill();
-            ctx.globalAlpha = 1;
+        }
+        update() {
+            this.speedX *= this.friction;
+            this.speedY *= this.friction;
+            this.speedY += this.gravity;
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.alpha -= this.flare ? 0.02 : 0.015;
         }
     }
 
-    function launchFirework(x, y) {
-        const colors = ['#00f2ff', '#7000ff', '#ff007a', '#ffd700', '#ffffff'];
+    function createExplosion(x, y) {
+        if (audioUnlocked) { SndPop.currentTime = 0; SndPop.play(); }
+        const colors = colorPalettes[theme];
         const color = colors[Math.floor(Math.random() * colors.length)];
-        for (let i = 0; i < 40; i++) {
-            particles.push(new FireworkParticle(x, y, color));
+        const amount = 80;
+        for (let i = 0; i < amount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 12;
+            particles.push(new Particle(x, y, color, Math.cos(angle)*velocity, Math.sin(angle)*velocity));
         }
     }
 
-    function init() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        stars = [];
-        for (let i = 0; i < 200; i++) stars.push(new Star());
-    }
-
-    function loop() {
-        // Night sky trails
-        ctx.fillStyle = 'rgba(2, 2, 5, 0.2)';
+    function animate() {
+        ctx.fillStyle = `rgba(3, 0, 8, 0.2)`; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        stars.forEach(s => s.draw());
-
         particles = particles.filter(p => p.alpha > 0);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
+        particles.forEach(p => { p.update(); p.draw(); });
 
-        if (Math.random() < 0.02) { // Auto fireworks
-            launchFirework(Math.random() * canvas.width, Math.random() * (canvas.height * 0.5));
+        if (Math.random() < 0.03) {
+            createExplosion(Math.random() * canvas.width, Math.random() * canvas.height * 0.7);
         }
-
-        requestAnimationFrame(loop);
+        requestAnimationFrame(animate);
     }
 
-    canvas.addEventListener('mousedown', (e) => launchFirework(e.clientX, e.clientY));
-    canvas.addEventListener('touchstart', (e) => launchFirework(e.touches[0].clientX, e.touches[0].clientY));
+    // Interactions
+    function unlockAudio() {
+        audioUnlocked = true;
+        document.getElementById('sound-hint').style.display = 'none';
+        launchFromUser({ clientX: innerWidth/2, clientY: innerHeight/2 });
+    }
 
-    window.addEventListener('resize', init);
-    init();
-    loop();
+    function launchFromUser(e) {
+        const x = e.clientX || (e.touches && e.touches[0].clientX);
+        const y = e.clientY || (e.touches && e.touches[0].clientY);
+        createExplosion(x, y);
+    }
 
-    // --- 2. TIMER LOGIC ---
-    const targetTime = new Date("January 1, 2026 00:00:00").getTime();
+    // Sparkle Flare path
+    function handleMove(e) {
+        const x = e.clientX || (e.touches && e.touches[0].clientX);
+        const y = e.clientY || (e.touches && e.touches[0].clientY);
+        particles.push(new Particle(x, y, colorPalettes[theme][0], 0, 0, true));
+    }
 
-    function updateTimer() {
-        const diff = targetTime - new Date().getTime();
-        
+    canvas.addEventListener('mousedown', (e) => { if(!audioUnlocked) unlockAudio(); launchFromUser(e); });
+    canvas.addEventListener('mousemove', handleMove);
+    canvas.addEventListener('touchstart', (e) => { if(!audioUnlocked) unlockAudio(); launchFromUser(e); });
+    canvas.addEventListener('touchmove', handleMove);
+
+    window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+    canvas.width = innerWidth; canvas.height = innerHeight;
+    animate();
+
+    // --- 3. LOGIC ---
+    function updateCountdown() {
+        const diff = new Date("2026-01-01T00:00:00").getTime() - Date.now();
         if (diff <= 0) {
-            document.querySelector('.year').innerText = "HAPPY 2026";
-            document.getElementById('tag').innerText = "LIMITLESS POTENTIAL UNLOCKED";
-            document.getElementById('main-btn').style.display = 'none';
-            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+            document.getElementById('year').innerText = "HAPPY 2026";
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
             return;
         }
-
-        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const m = Math.floor((diff / 1000 / 60) % 60);
-        const s = Math.floor((diff / 1000) % 60);
-
-        document.getElementById('h').innerText = String(h).padStart(2, '0');
-        document.getElementById('m').innerText = String(m).padStart(2, '0');
-        document.getElementById('s').innerText = String(s).padStart(2, '0');
+        document.getElementById('h').innerText = String(Math.floor((diff/1000/60/60)%24)).padStart(2,'0');
+        document.getElementById('m').innerText = String(Math.floor((diff/1000/60)%60)).padStart(2,'0');
+        document.getElementById('s').innerText = String(Math.floor((diff/1000)%60)).padStart(2,'0');
     }
-    setInterval(updateTimer, 1000);
-    updateTimer();
+    setInterval(updateCountdown, 1000);
 
-    // --- 3. CUSTOM VIBE SYSTEM ---
-    function toggleDrawer() { document.getElementById('drawer').classList.toggle('active'); }
+    // Share & URL system
+    function openShare() { document.getElementById('overlay').style.display='flex'; }
+    
+    function genShareLink() {
+        const wish = document.getElementById('wish-input').value;
+        const dat = { w: wish, t: theme };
+        const code = btoa(JSON.stringify(dat));
+        const link = location.origin + location.pathname + '?j=' + code;
+        navigator.clipboard.writeText(link);
+        alert("Personalized " + theme + " link copied!");
+        document.getElementById('overlay').style.display='none';
+    }
 
-    function share() {
-        const text = document.getElementById('vibe-input').value;
-        if (!text) return alert("Write your 2026 intention!");
-
-        const encoded = btoa(unescape(encodeURIComponent(text)));
-        const url = window.location.origin + window.location.pathname + '?vibe=' + encoded;
-        
-        if (navigator.share) {
-            navigator.share({ title: 'New Year 2026', text: text, url: url });
-        } else {
-            navigator.clipboard.writeText(url);
-            alert("Magic link copied! Send it to your friends. ✨");
+    // Init state from URL
+    const urlP = new URLSearchParams(location.search);
+    if(urlP.get('j')) {
+        const dec = JSON.parse(atob(urlP.get('j')));
+        if(dec.t) setTheme(dec.t);
+        if(dec.w) {
+            document.getElementById('vibe-text').innerText = dec.w;
+            document.getElementById('vibe-pill').style.display = 'block';
         }
-        toggleDrawer();
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('vibe')) {
-        try {
-            const decoded = decodeURIComponent(escape(atob(params.get('vibe'))));
-            document.getElementById('vibe-text').innerText = decoded;
-            document.getElementById('vibe-display').style.display = 'block';
-        } catch(e) {}
     }
 </script>
-
 </body>
 </html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>2026 | Genesis</title>
+    <!-- canvas-confetti for the final "big" moment -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
+
+        :root {
+            --primary: #00f2ff;
+            --accent: #7000ff;
+            --text: #ffffff;
+            --card: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #020205;
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            cursor: crosshair;
+        }
+
+        .interface {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 0%, #000 90%);
+        }
+
+        .header {
+            margin-bottom: 5vh;
+            text-align: center;
+        }
+
+        .year {
+            font-size: clamp(5rem, 25vw, 9rem);
+            font-weight: 800;
+            letter-spacing: -6px;
+            background: linear-gradient(180deg, #fff 40%, rgba(255,255,255,0.1) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 0.8;
+            filter: drop-shadow(0 0 30px rgba(0, 242, 255, 0.3));
+        }
+
+        .tagline {
+            font-size: 0.8rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-top: 10px;
+        }
+
+        .timer {
+            display: flex;
+            gap: 15px;
+            pointer-events: auto;
+        }
+
+        .box {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 20px 10px;
+            width: clamp(80px, 25vw, 130px);
+            text-align: center;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .box:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .val {
+            display: block;
+            font-size: 2.8rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+        }
+
+        .label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.5;
+            font-weight: 400;
+        }
+
+        .vibe-card {
+            margin-top: 30px;
+            background: linear-gradient(90deg, transparent, rgba(112,0,255,0.2), transparent);
+            padding: 15px;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 50px;
+            display: none;
+            text-align: center;
+        }
+
+        .action-btn {
+            position: absolute;
+            bottom: 40px;
+            pointer-events: auto;
+            background: #fff;
+            color: #000;
+            padding: 18px 35px;
+            border-radius: 100px;
+            font-weight: 800;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: 0.3s;
+        }
+
+        .action-btn:active { transform: scale(0.9); }
+
+        /* Modal Overlay */
+        .drawer {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 50vh;
+            background: #08080a;
+            z-index: 100;
+            border-radius: 30px 30px 0 0;
+            border-top: 1px solid var(--primary);
+            padding: 30px;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .drawer.active { bottom: 0; }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: #121216;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 15px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            margin: 15px 0;
+            outline: none;
+        }
+
+        textarea:focus { border-color: var(--primary); }
+
+        .big-text { font-weight: 800; font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="interface">
+    <div class="header">
+        <h1 class="year">2026</h1>
+        <p class="tagline" id="tag">System Operational</p>
+    </div>
+
+    <div class="timer">
+        <div class="box">
+            <span class="val" id="h">00</span>
+            <span class="label">Hrs</span>
+        </div>
+        <div class="box">
+            <span class="val" id="m">00</span>
+            <span class="label">Min</span>
+        </div>
+        <div class="box">
+            <span class="val" id="s">00</span>
+            <span class="label">Sec</span>
+        </div>
+    </div>
+
+    <div class="vibe-card" id="vibe-display">
+        <p id="vibe-text" style="font-weight: 200; italic;"></p>
+    </div>
+
+    <button class="action-btn" id="main-btn" onclick="toggleDrawer()">Personalize ✦</button>
+</div>
+
+<div class="drawer" id="drawer">
+    <p class="big-text">Set Your Vibe</p>
+    <p style="font-size: 0.8rem; opacity: 0.5;">Enter a wish for 2026. This creates a custom link for friends.</p>
+    <textarea id="vibe-input" placeholder="e.g. Health, success, and clear skies!"></textarea>
+    <button class="action-btn" style="position: relative; bottom: 0; width: 100%;" onclick="share()">Generate Magic Link</button>
+</div>
+
+<script>
+    // --- 1. CORE PHYSICS ENGINE (FIREWORKS & STARS) ---
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let fireworks = [];
+    let stars = [];
+
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 1.5;
+            this.blink = Math.random() * 0.02;
+            this.opacity = Math.random();
+        }
+        draw() {
+            this.opacity += this.blink;
+            if (this.opacity > 1 || this.opacity < 0.2) this.blink *= -1;
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    class FireworkParticle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.vx = (Math.random() - 0.5) * 8;
+            this.vy = (Math.random() - 0.5) * 8;
+            this.alpha = 1;
+            this.gravity = 0.05;
+        }
+        update() {
+            this.vx *= 0.98;
+            this.vy *= 0.98;
+            this.vy += this.gravity;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.alpha -= 0.012;
+        }
+        draw() {
+            ctx.globalAlpha = this.alpha;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    function launchFirework(x, y) {
+        const colors = ['#00f2ff', '#7000ff', '#ff007a', '#ffd700', '#ffffff'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        for (let i = 0; i < 40; i++) {
+            particles.push(new FireworkParticle(x, y, color));
+        }
+    }
+
+    function init() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        stars = [];
+        for (let i = 0; i < 200; i++) stars.push(new Star());
+    }
+
+    function loop() {
+        // Night sky trails
+        ctx.fillStyle = 'rgba(2, 2, 5, 0.2)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        stars.forEach(s => s.draw());
+
+        particles = particles.filter(p => p.alpha > 0);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        if (Math.random() < 0.02) { // Auto fireworks
+            launchFirework(Math.random() * canvas.width, Math.random() * (canvas.height * 0.5));
+        }
+
+        requestAnimationFrame(loop);
+    }
+
+    canvas.addEventListener('mousedown', (e) => launchFirework(e.clientX, e.clientY));
+    canvas.addEventListener('touchstart', (e) => launchFirework(e.touches[0].clientX, e.touches[0].clientY));
+
+    window.addEventListener('resize', init);
+    init();
+    loop();
+
+    // --- 2. TIMER LOGIC ---
+    const targetTime = new Date("January 1, 2026 00:00:00").getTime();
+
+    function updateTimer() {
+        const diff = targetTime - new Date().getTime();
+        
+        if (diff <= 0) {
+            document.querySelector('.year').innerText = "HAPPY 2026";
+            document.getElementById('tag').innerText = "LIMITLESS POTENTIAL UNLOCKED";
+            document.getElementById('main-btn').style.display = 'none';
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+            return;
+        }
+
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+
+        document.getElementById('h').innerText = String(h).padStart(2, '0');
+        document.getElementById('m').innerText = String(m).padStart(2, '0');
+        document.getElementById('s').innerText = String(s).padStart(2, '0');
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // --- 3. CUSTOM VIBE SYSTEM ---
+    function toggleDrawer() { document.getElementById('drawer').classList.toggle('active'); }
+
+    function share() {
+        const text = document.getElementById('vibe-input').value;
+        if (!text) return alert("Write your 2026 intention!");
+
+        const encoded = btoa(unescape(encodeURIComponent(text)));
+        const url = window.location.origin + window.location.pathname + '?vibe=' + encoded;
+        
+        if (navigator.share) {
+            navigator.share({ title: 'New Year 2026', text: text, url: url });
+        } else {
+            navigator.clipboard.writeText(url);
+            alert("Magic link copied! Send it to your friends. ✨");
+        }
+        toggleDrawer();
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('vibe')) {
+        try {
+            const decoded = decodeURIComponent(escape(atob(params.get('vibe'))));
+            document.getElementById('vibe-text').innerText = decoded;
+            document.getElementById('vibe-display').style.display = 'block';
+        } catch(e) {}
+    }
+</script>
+
+</body>
+</html>
