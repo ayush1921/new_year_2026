@@ -1,253 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>2026 | Infinity Countdown</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>2026 | Infinity Engine</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        :root {
+            /* Cyber Theme (Default) */
+            --bg: #010103;
+            --primary: #00f2ff;
+            --accent: #ff007a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --font: 'Space Grotesk', sans-serif;
+        }
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
+        [data-theme="royal"] { --bg: #050400; --primary: #ffd700; --accent: #ffffff; }
+        [data-theme="cosmic"] { --bg: #020008; --primary: #9d00ff; --accent: #00ffaa; }
 
-:root {
-    --bg: #030008;
-    --primary: #00f2ff;
-    --secondary: #ff007a;
-    --glass: rgba(255,255,255,0.05);
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-[data-theme="royal"] {
-    --bg:#0a0800; --primary:#ffd700; --secondary:#fff;
-}
-[data-theme="cosmic"] {
-    --bg:#010114; --primary:#9d00ff; --secondary:#00ffaa;
-}
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            overflow: hidden; 
+            height: 100vh; 
+            font-family: var(--font);
+            transition: background 1.5s ease;
+        }
 
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Space Grotesk',sans-serif; }
+        canvas { position: fixed; top: 0; left: 0; z-index: 1; cursor: crosshair; }
 
-body {
-    background:var(--bg);
-    color:#fff;
-    overflow:hidden;
-    height:100vh;
-}
+        /* UI Overlays */
+        .ui { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; text-align: center; padding: 20px; }
+        
+        .header { margin-bottom: 2rem; }
+        .year { 
+            font-size: clamp(5rem, 22vw, 11rem); 
+            font-weight: 700; 
+            letter-spacing: -6px; 
+            color: var(--primary); 
+            line-height: 0.8;
+            filter: drop-shadow(0 0 30px var(--primary));
+            transition: 0.5s ease;
+        }
 
-canvas {
-    position:fixed;
-    inset:0;
-}
+        .timer-grid { display: flex; gap: 12px; pointer-events: auto; }
+        .box { 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 20px 10px; 
+            border-radius: 22px; 
+            min-width: clamp(80px, 25vw, 110px);
+            transition: 0.3s;
+        }
+        .box:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .box .val { display: block; font-size: 2.8rem; font-weight: 700; color: #fff; }
+        .box .lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; }
 
-.ui {
-    position:relative;
-    z-index:10;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-}
+        /* Control Panel */
+        .top-ctrl { position: fixed; top: 25px; left: 25px; display: flex; flex-direction: column; gap: 15px; pointer-events: auto; z-index: 100; }
+        .ctrl-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); transition: 0.3s; color: white; }
+        .ctrl-btn:active { transform: scale(0.9); }
 
-.hero {
-    font-size:clamp(5rem,25vw,10rem);
-    font-weight:700;
-    letter-spacing:-4px;
-    color:var(--primary);
-    filter:drop-shadow(0 0 20px var(--primary));
-}
+        .btn-share { 
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
+            pointer-events: auto; background: #fff; color: #000; padding: 18px 45px; 
+            border-radius: 100px; font-weight: 700; border: none; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
 
-.countdown-row {
-    display:flex;
-    gap:12px;
-}
+        /* Customize Drawer */
+        .drawer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; pointer-events: auto; }
+        .modal { background: #0a0a0c; width: 100%; max-width: 400px; padding: 35px; border-radius: 35px; border: 1px solid var(--primary); text-align: left; }
+        textarea { width: 100%; height: 110px; background: #18181b; border: 1px solid #333; border-radius: 15px; color: #fff; padding: 15px; margin: 15px 0; font-family: inherit; font-size: 1rem; outline: none; }
+        
+        #vibe-pill { margin-top: 30px; padding: 10px 20px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--primary); display: none; font-weight: 300; italic; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-.box {
-    background:var(--glass);
-    backdrop-filter:blur(15px);
-    padding:15px;
-    border-radius:20px;
-    min-width:90px;
-}
-
-.num { font-size:2.5rem; font-weight:700; }
-.lbl { font-size:0.7rem; opacity:0.6; letter-spacing:2px; }
-
-.tap-msg {
-    position:fixed;
-    bottom:30px;
-    width:100%;
-    text-align:center;
-    font-size:0.7rem;
-    letter-spacing:4px;
-    opacity:0.4;
-}
-
-.theme-shifter {
-    position:fixed;
-    top:20px;
-    left:20px;
-    display:flex;
-    gap:8px;
-    z-index:20;
-}
-.t-btn {
-    width:32px; height:32px;
-    border-radius:50%;
-    border:2px solid #fff;
-    cursor:pointer;
-}
-</style>
+        .mute-active { opacity: 0.4; }
+    </style>
 </head>
-
 <body data-theme="cyber">
 
-<div class="theme-shifter">
-    <div class="t-btn" style="background:#00f2ff" onclick="setTheme('cyber')"></div>
-    <div class="t-btn" style="background:#ffd700" onclick="setTheme('royal')"></div>
-    <div class="t-btn" style="background:#9d00ff" onclick="setTheme('cosmic')"></div>
-</div>
-
-<canvas id="canvas"></canvas>
-
-<div class="ui">
-    <div class="hero" id="year">2026</div>
-    <div class="countdown-row">
-        <div class="box"><span class="num" id="h">00</span><div class="lbl">HRS</div></div>
-        <div class="box"><span class="num" id="m">00</span><div class="lbl">MIN</div></div>
-        <div class="box"><span class="num" id="s">00</span><div class="lbl">SEC</div></div>
+    <div class="top-ctrl">
+        <div class="ctrl-btn" style="background: #00f2ff;" onclick="setTheme('cyber')"></div>
+        <div class="ctrl-btn" style="background: #ffd700;" onclick="setTheme('royal')"></div>
+        <div class="ctrl-btn" style="background: #9d00ff;" onclick="setTheme('cosmic')"></div>
+        <div class="ctrl-btn" id="mute-trigger" onclick="toggleMute()">🔊</div>
     </div>
-</div>
 
-<div class="tap-msg" id="tap">TAP TO UNLOCK AUDIO & IGNITE SKY</div>
+    <canvas id="stage"></canvas>
+
+    <div class="ui">
+        <div class="header">
+            <h1 class="year" id="main-year">2026</h1>
+            <p id="sub-tag" style="opacity: 0.5; letter-spacing: 5px; margin-top: 10px; font-size: 0.75rem;">GENESIS IMMINENT</p>
+        </div>
+
+        <div class="timer-grid">
+            <div class="box"><span class="val" id="h">00</span><span class="lbl">Hrs</span></div>
+            <div class="box"><span class="val" id="m">00</span><span class="lbl">Min</span></div>
+            <div class="box"><span class="val" id="s">00</span><span class="lbl">Sec</span></div>
+        </div>
+
+        <div id="vibe-pill"><span id="vibe-val"></span></div>
+    </div>
+
+    <button class="btn-share" onclick="openDrawer()">Customize Wish ✦</button>
+
+    <div class="drawer" id="drawer">
+        <div class="modal">
+            <h2 style="font-weight: 700; margin-bottom: 5px;">Forge Your Legacy</h2>
+            <p style="opacity: 0.5; font-size: 0.8rem;">Select theme above + write wish below to share.</p>
+            <textarea id="wish-input" placeholder="e.g. 2026: Be fearless and bold..."></textarea>
+            <button class="btn-share" style="position: static; width: 100%; transform: none;" onclick="copyLink()">Blast Magic Link</button>
+            <p style="text-align: center; margin-top: 20px; font-size: 0.8rem; opacity: 0.4; cursor: pointer;" onclick="closeDrawer()">Go Back</p>
+        </div>
+    </div>
 
 <script>
-/* ===================== CANVAS ===================== */
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+    // --- 1. SOUND ENGINE ---
+    const sndWhoosh = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+    const sndBurst  = new Audio('https://assets.mixkit.co/active_storage/sfx/1998/1998-preview.mp3');
+    const sndPad    = new Audio('https://assets.mixkit.co/active_storage/sfx/1157/1157-preview.mp3'); // Dreamy loop
+    
+    sndPad.loop = true;
+    sndPad.volume = 0.2;
+    sndWhoosh.volume = 0.12;
+    sndBurst.volume  = 0.15;
 
-window.onresize = () => {
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-};
+    let isMuted = false;
+    let audioStarted = false;
+    let lastSoundTime = 0;
 
-/* ===================== THEMES ===================== */
-const palettes = {
-    cyber:['#00f2ff','#ff007a','#ffffff','#7000ff'],
-    royal:['#ffd700','#ffffff','#ffeb3b','#aa8022'],
-    cosmic:['#9d00ff','#00ffaa','#ff00e6','#2b00ff']
-};
-let theme='cyber';
+    function playFireworkSound(force = false) {
+        if (isMuted || !audioStarted) return;
+        const now = Date.now();
+        if (!force && now - lastSoundTime < 150) return;
+        if (!force && Math.random() < 0.3) return; // Natural variance
 
-function setTheme(t){
-    theme=t;
-    document.body.dataset.theme=t;
-}
+        lastSoundTime = now;
+        sndWhoosh.playbackRate = 0.8 + Math.random() * 0.4;
+        sndBurst.playbackRate  = 0.9 + Math.random() * 0.2;
+        
+        const w = sndWhoosh.cloneNode();
+        const b = sndBurst.cloneNode();
+        w.volume = 0.12; b.volume = 0.15;
 
-/* ===================== SOUND ENGINE (PLEASING) ===================== */
-let audioUnlocked=false;
-let lastSound=0;
-
-const whoosh = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
-const burst  = new Audio('https://assets.mixkit.co/active_storage/sfx/1998/1998-preview.mp3');
-
-whoosh.volume=0.15;
-burst.volume=0.18;
-
-function playFireworkSound(){
-    const now=Date.now();
-    if(now-lastSound<120) return;
-    lastSound=now;
-
-    whoosh.playbackRate=0.9+Math.random()*0.2;
-    burst.playbackRate=0.95+Math.random()*0.15;
-
-    whoosh.currentTime=0;
-    burst.currentTime=0;
-    whoosh.play();
-    setTimeout(()=>burst.play(),80);
-}
-
-/* ===================== PARTICLES ===================== */
-let particles=[];
-
-class Particle{
-    constructor(x,y,color,vx,vy,flare=false){
-        this.x=x; this.y=y;
-        this.vx=vx; this.vy=vy;
-        this.color=color;
-        this.alpha=1;
-        this.friction=flare?0.94:0.96;
-        this.gravity=0.12;
-        this.flare=flare;
+        w.play();
+        setTimeout(() => b.play(), 60 + Math.random() * 40);
     }
-    update(){
-        this.vx*=this.friction;
-        this.vy*=this.friction;
-        this.vy+=this.gravity;
-        this.x+=this.vx;
-        this.y+=this.vy;
-        this.alpha-=this.flare?0.025:0.015;
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        document.getElementById('mute-trigger').innerText = isMuted ? '🔇' : '🔊';
+        document.getElementById('mute-trigger').classList.toggle('mute-active', isMuted);
+        if (isMuted) sndPad.pause(); else if(audioStarted) sndPad.play();
     }
-    draw(){
-        ctx.globalAlpha=this.alpha;
-        ctx.fillStyle=this.color;
-        ctx.beginPath();
-        ctx.arc(this.x,this.y,this.flare?2:1.2,0,Math.PI*2);
-        ctx.fill();
+
+    function startAudioContext() {
+        if (!audioStarted) {
+            audioStarted = true;
+            sndPad.play();
+        }
     }
-}
 
-function explode(x,y){
-    if(audioUnlocked && Math.random()<0.6) playFireworkSound();
-    const colors=palettes[theme];
-    for(let i=0;i<80;i++){
-        const a=Math.random()*Math.PI*2;
-        const v=Math.random()*12;
-        particles.push(new Particle(x,y,colors[Math.random()*colors.length|0],Math.cos(a)*v,Math.sin(a)*v));
+    // --- 2. THEMES & URLS ---
+    let currentTheme = 'cyber';
+    const palettes = {
+        cyber: ['#00f2ff', '#ff007a', '#ffffff'],
+        royal: ['#ffd700', '#ffffff', '#aa8022'],
+        cosmic: ['#9d00ff', '#00ffaa', '#ff00e6']
+    };
+
+    function setTheme(t) {
+        currentTheme = t;
+        document.body.setAttribute('data-theme', t);
+        document.documentElement.style.setProperty('--primary', palettes[t][0]);
     }
-}
 
-/* ===================== LOOP ===================== */
-function animate(){
-    ctx.fillStyle='rgba(3,0,8,0.2)';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    // --- 3. PHYSICS & ENGINE ---
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
 
-    particles=particles.filter(p=>p.alpha>0);
-    particles.forEach(p=>{p.update();p.draw();});
-
-    if(Math.random()<0.03)
-        explode(Math.random()*canvas.width,Math.random()*canvas.height*0.7);
-
-    requestAnimationFrame(animate);
-}
-animate();
-
-/* ===================== INPUT ===================== */
-function unlock(e){
-    audioUnlocked=true;
-    document.getElementById('tap').style.display='none';
-    explode(e.clientX||innerWidth/2,e.clientY||innerHeight/2);
-}
-
-canvas.addEventListener('mousedown',e=>{ if(!audioUnlocked) unlock(e); else explode(e.clientX,e.clientY); });
-canvas.addEventListener('touchstart',e=>{ if(!audioUnlocked) unlock(e.touches[0]); });
-
-/* ===================== COUNTDOWN ===================== */
-function update(){
-    const diff=new Date("2026-01-01T00:00:00")-Date.now();
-    if(diff<=0){
-        document.getElementById('year').innerText="HAPPY 2026";
-        confetti({particleCount:250,spread:120});
-        return;
+    class Particle {
+        constructor(x, y, color, sx, sy, fade = 0.015, size = 1.2) {
+            this.x = x; this.y = y; this.color = color;
+            this.sx = sx; this.sy = sy;
+            this.alpha = 1; this.fade = fade;
+            this.gravity = 0.1; this.size = size;
+        }
+        draw() {
+            ctx.globalAlpha = this.alpha;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        update() {
+            this.sx *= 0.97; this.sy *= 0.97;
+            this.sy += this.gravity;
+            this.x += this.sx; this.y += this.sy;
+            this.alpha -= this.fade;
+        }
     }
-    h.innerText=String(Math.floor(diff/36e5)%24).padStart(2,'0');
-    m.innerText=String(Math.floor(diff/6e4)%60).padStart(2,'0');
-    s.innerText=String(Math.floor(diff/1e3)%60).padStart(2,'0');
-}
-setInterval(update,1000);
+
+    function createBurst(x, y, isAuto = false) {
+        if (!audioStarted) return;
+        playFireworkSound(!isAuto);
+        const palette = palettes[currentTheme];
+        const color = palette[Math.floor(Math.random() * palette.length)];
+        const count = 70;
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 9;
+            particles.push(new Particle(x, y, color, Math.cos(angle) * velocity, Math.sin(angle) * velocity));
+        }
+    }
+
+    function loop() {
+        ctx.fillStyle = `rgba(${currentTheme==='royal'?5:1}, 0, ${currentTheme==='cosmic'?8:3}, 0.2)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        particles = particles.filter(p => p.alpha > 0);
+        particles.forEach(p => { p.update(); p.draw(); });
+
+        if (Math.random() < 0.03 && audioStarted) {
+            createBurst(Math.random() * canvas.width, Math.random() * canvas.height * 0.7, true);
+        }
+        requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
+    canvas.addEventListener('click', (e) => { 
+        startAudioContext(); 
+        createBurst(e.clientX, e.clientY); 
+    });
+    
+    // Trail Flare
+    canvas.addEventListener('mousemove', (e) => {
+        if(audioStarted && Math.random() < 0.2) 
+            particles.push(new Particle(e.clientX, e.clientY, palettes[currentTheme][0], (Math.random()-0.5), (Math.random()-0.5), 0.05, 1));
+    });
+
+    canvas.width = innerWidth; canvas.height = innerHeight;
+    loop();
+
+    // --- 4. DATA LOGIC ---
+    function openDrawer() { document.getElementById('drawer').style.display = 'flex'; }
+    function closeDrawer() { document.getElementById('drawer').style.display = 'none'; }
+
+    function copyLink() {
+        const wish = document.getElementById('wish-input').value;
+        const config = { w: wish, t: currentTheme };
+        const base64 = btoa(JSON.stringify(config));
+        const finalUrl = location.origin + location.pathname + '?v=' + base64;
+        
+        navigator.clipboard.writeText(finalUrl);
+        alert("Personalized engine link copied to clipboard!");
+        closeDrawer();
+    }
+
+    function checkURL() {
+        const p = new URLSearchParams(location.search).get('v');
+        if (p) {
+            try {
+                const config = JSON.parse(atob(p));
+                if(config.t) setTheme(config.t);
+                if(config.w) {
+                    document.getElementById('vibe-val').innerText = config.w;
+                    document.getElementById('vibe-pill').style.display = 'block';
+                }
+            } catch(e) { console.error("Config load error"); }
+        }
+    }
+
+    function timer() {
+        const diff = new Date("2026-01-01T00:00:00").getTime() - Date.now();
+        if (diff <= 0) {
+            document.getElementById('main-year').innerText = "HAPPY 2026";
+            document.getElementById('sub-tag').innerText = "LIMITLESS ERA START";
+            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+            return;
+        }
+        document.getElementById('h').innerText = String(Math.floor((diff/1000/60/60)%24)).padStart(2,'0');
+        document.getElementById('m').innerText = String(Math.floor((diff/1000/60)%60)).padStart(2,'0');
+        document.getElementById('s').innerText = String(Math.floor((diff/1000)%60)).padStart(2,'0');
+    }
+    
+    setInterval(timer, 1000);
+    checkURL();
 </script>
 </body>
 </html>

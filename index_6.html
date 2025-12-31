@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>2026 | Infinity Countdown</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap');
+
+:root {
+    --bg: #030008;
+    --primary: #00f2ff;
+    --secondary: #ff007a;
+    --glass: rgba(255,255,255,0.05);
+}
+
+[data-theme="royal"] {
+    --bg:#0a0800; --primary:#ffd700; --secondary:#fff;
+}
+[data-theme="cosmic"] {
+    --bg:#010114; --primary:#9d00ff; --secondary:#00ffaa;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Space Grotesk',sans-serif; }
+
+body {
+    background:var(--bg);
+    color:#fff;
+    overflow:hidden;
+    height:100vh;
+}
+
+canvas {
+    position:fixed;
+    inset:0;
+}
+
+.ui {
+    position:relative;
+    z-index:10;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+.hero {
+    font-size:clamp(5rem,25vw,10rem);
+    font-weight:700;
+    letter-spacing:-4px;
+    color:var(--primary);
+    filter:drop-shadow(0 0 20px var(--primary));
+}
+
+.countdown-row {
+    display:flex;
+    gap:12px;
+}
+
+.box {
+    background:var(--glass);
+    backdrop-filter:blur(15px);
+    padding:15px;
+    border-radius:20px;
+    min-width:90px;
+}
+
+.num { font-size:2.5rem; font-weight:700; }
+.lbl { font-size:0.7rem; opacity:0.6; letter-spacing:2px; }
+
+.tap-msg {
+    position:fixed;
+    bottom:30px;
+    width:100%;
+    text-align:center;
+    font-size:0.7rem;
+    letter-spacing:4px;
+    opacity:0.4;
+}
+
+.theme-shifter {
+    position:fixed;
+    top:20px;
+    left:20px;
+    display:flex;
+    gap:8px;
+    z-index:20;
+}
+.t-btn {
+    width:32px; height:32px;
+    border-radius:50%;
+    border:2px solid #fff;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body data-theme="cyber">
+
+<div class="theme-shifter">
+    <div class="t-btn" style="background:#00f2ff" onclick="setTheme('cyber')"></div>
+    <div class="t-btn" style="background:#ffd700" onclick="setTheme('royal')"></div>
+    <div class="t-btn" style="background:#9d00ff" onclick="setTheme('cosmic')"></div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div class="ui">
+    <div class="hero" id="year">2026</div>
+    <div class="countdown-row">
+        <div class="box"><span class="num" id="h">00</span><div class="lbl">HRS</div></div>
+        <div class="box"><span class="num" id="m">00</span><div class="lbl">MIN</div></div>
+        <div class="box"><span class="num" id="s">00</span><div class="lbl">SEC</div></div>
+    </div>
+</div>
+
+<div class="tap-msg" id="tap">TAP TO UNLOCK AUDIO & IGNITE SKY</div>
+
+<script>
+/* ===================== CANVAS ===================== */
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+window.onresize = () => {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+};
+
+/* ===================== THEMES ===================== */
+const palettes = {
+    cyber:['#00f2ff','#ff007a','#ffffff','#7000ff'],
+    royal:['#ffd700','#ffffff','#ffeb3b','#aa8022'],
+    cosmic:['#9d00ff','#00ffaa','#ff00e6','#2b00ff']
+};
+let theme='cyber';
+
+function setTheme(t){
+    theme=t;
+    document.body.dataset.theme=t;
+}
+
+/* ===================== SOUND ENGINE (PLEASING) ===================== */
+let audioUnlocked=false;
+let lastSound=0;
+
+const whoosh = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+const burst  = new Audio('https://assets.mixkit.co/active_storage/sfx/1998/1998-preview.mp3');
+
+whoosh.volume=0.15;
+burst.volume=0.18;
+
+function playFireworkSound(){
+    const now=Date.now();
+    if(now-lastSound<120) return;
+    lastSound=now;
+
+    whoosh.playbackRate=0.9+Math.random()*0.2;
+    burst.playbackRate=0.95+Math.random()*0.15;
+
+    whoosh.currentTime=0;
+    burst.currentTime=0;
+    whoosh.play();
+    setTimeout(()=>burst.play(),80);
+}
+
+/* ===================== PARTICLES ===================== */
+let particles=[];
+
+class Particle{
+    constructor(x,y,color,vx,vy,flare=false){
+        this.x=x; this.y=y;
+        this.vx=vx; this.vy=vy;
+        this.color=color;
+        this.alpha=1;
+        this.friction=flare?0.94:0.96;
+        this.gravity=0.12;
+        this.flare=flare;
+    }
+    update(){
+        this.vx*=this.friction;
+        this.vy*=this.friction;
+        this.vy+=this.gravity;
+        this.x+=this.vx;
+        this.y+=this.vy;
+        this.alpha-=this.flare?0.025:0.015;
+    }
+    draw(){
+        ctx.globalAlpha=this.alpha;
+        ctx.fillStyle=this.color;
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.flare?2:1.2,0,Math.PI*2);
+        ctx.fill();
+    }
+}
+
+function explode(x,y){
+    if(audioUnlocked && Math.random()<0.6) playFireworkSound();
+    const colors=palettes[theme];
+    for(let i=0;i<80;i++){
+        const a=Math.random()*Math.PI*2;
+        const v=Math.random()*12;
+        particles.push(new Particle(x,y,colors[Math.random()*colors.length|0],Math.cos(a)*v,Math.sin(a)*v));
+    }
+}
+
+/* ===================== LOOP ===================== */
+function animate(){
+    ctx.fillStyle='rgba(3,0,8,0.2)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    particles=particles.filter(p=>p.alpha>0);
+    particles.forEach(p=>{p.update();p.draw();});
+
+    if(Math.random()<0.03)
+        explode(Math.random()*canvas.width,Math.random()*canvas.height*0.7);
+
+    requestAnimationFrame(animate);
+}
+animate();
+
+/* ===================== INPUT ===================== */
+function unlock(e){
+    audioUnlocked=true;
+    document.getElementById('tap').style.display='none';
+    explode(e.clientX||innerWidth/2,e.clientY||innerHeight/2);
+}
+
+canvas.addEventListener('mousedown',e=>{ if(!audioUnlocked) unlock(e); else explode(e.clientX,e.clientY); });
+canvas.addEventListener('touchstart',e=>{ if(!audioUnlocked) unlock(e.touches[0]); });
+
+/* ===================== COUNTDOWN ===================== */
+function update(){
+    const diff=new Date("2026-01-01T00:00:00")-Date.now();
+    if(diff<=0){
+        document.getElementById('year').innerText="HAPPY 2026";
+        confetti({particleCount:250,spread:120});
+        return;
+    }
+    h.innerText=String(Math.floor(diff/36e5)%24).padStart(2,'0');
+    m.innerText=String(Math.floor(diff/6e4)%60).padStart(2,'0');
+    s.innerText=String(Math.floor(diff/1e3)%60).padStart(2,'0');
+}
+setInterval(update,1000);
+</script>
+</body>
+</html>
