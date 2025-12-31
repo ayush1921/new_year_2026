@@ -299,6 +299,16 @@
             to { opacity: 1; }
         }
 
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        }
+
         .modal {
             background: #0a0a0c;
             width: 100%;
@@ -614,24 +624,41 @@
 
             /* Mobile modal */
             .modal {
-                padding: 30px 25px;
+                padding: 25px 20px;
                 border-radius: 25px;
-                max-width: 90%;
+                max-width: 92%;
+                max-height: 85vh;
+                overflow-y: auto;
             }
 
             .modal h2 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
 
             .modal p {
                 font-size: 0.85rem;
             }
 
+            .modal label {
+                font-size: 0.9rem !important;
+            }
+
             textarea {
-                height: 100px;
                 font-size: 0.95rem;
                 padding: 12px;
                 border-radius: 12px;
+            }
+
+            #wish-input {
+                height: 80px !important;
+            }
+
+            #goals-input {
+                height: 120px !important;
+            }
+
+            #notes-input {
+                height: 100px !important;
             }
 
             #vibe-pill {
@@ -691,7 +718,24 @@
             }
 
             .modal {
-                padding: 25px 20px;
+                padding: 20px 15px;
+                max-height: 90vh;
+            }
+
+            textarea {
+                font-size: 0.9rem;
+            }
+
+            #wish-input {
+                height: 70px !important;
+            }
+
+            #goals-input {
+                height: 100px !important;
+            }
+
+            #notes-input {
+                height: 90px !important;
             }
         }
 
@@ -854,26 +898,63 @@
         <!-- Custom Message Display -->
         <div id="vibe-pill"><span id="vibe-val"></span></div>
 
-        <!-- Resolution Section -->
-        <div class="content-section">
-            <h2 class="section-title">✨ 2026 Resolution</h2>
+        <!-- User's Goals Section (shown when they visit their custom link) -->
+        <div id="user-goals-section" style="display: none;" class="content-section">
+            <h2 class="section-title">🎯 My 2026 Goals</h2>
+            <div id="user-goals-content" class="wishes-text" style="white-space: pre-wrap;"></div>
+        </div>
+
+        <!-- User's Notes Section (shown when they visit their custom link) -->
+        <div id="user-notes-section" style="display: none;" class="content-section">
+            <h2 class="section-title">📝 My Personal Notes</h2>
+            <div id="user-notes-content" class="wishes-text" style="white-space: pre-wrap;"></div>
+            <p class="wishes-text" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 1rem; opacity: 0.7;">
+                ⏰ Last updated: <span id="saved-date"></span>
+            </p>
+        </div>
+
+        <!-- Default Resolution Section (hidden when custom link is loaded) -->
+        <div id="default-resolution-section" class="content-section">
+            <h2 class="section-title">✨ Create Your 2026 Vision</h2>
             <p class="wishes-text">
                 What's your vision for 2026? Whether it's <span class="highlight">chasing dreams</span>, building something amazing, or simply living your best life—commit to it now.
             </p>
             <p class="wishes-text">
-                The future belongs to those who believe in the beauty of their dreams. Make this year count! 💫
+                Click below to create your personal vision board with goals and notes you can revisit all year long! 💫
             </p>
+            <button class="btn-share" style="position: static; margin-top: 20px; transform: none;" onclick="openDrawer()">
+                🎯 Create My Vision Board
+            </button>
         </div>
     </div>
 
-    <button class="btn-share" onclick="openDrawer()">Create Your Wish ✦</button>
+    <button class="btn-share" onclick="openDrawer()">
+        <span id="btn-text">✨ Create Your 2026 Vision</span>
+    </button>
 
     <div class="drawer" id="drawer">
         <div class="modal">
-            <h2 style="font-weight: 700; margin-bottom: 5px; font-family: var(--font-display);">Create Your Vibe ✨</h2>
-            <p style="opacity: 0.6; font-size: 0.9rem; margin-bottom: 20px;">Pick a theme & share your 2026 energy with the world</p>
-            <textarea id="wish-input" placeholder="e.g., 2026: Living my best life, chasing dreams, and making every moment count! 🚀"></textarea>
-            <button class="btn-share" style="position: static; width: 100%; transform: none;" onclick="copyLink()">Generate Link 🔗</button>
+            <h2 style="font-weight: 700; margin-bottom: 5px; font-family: var(--font-display);">Your 2026 Vision ✨</h2>
+            <p style="opacity: 0.6; font-size: 0.9rem; margin-bottom: 20px;">Create your personal vision board - save it & check back all year!</p>
+
+            <label style="display: block; color: var(--primary); font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">Main Wish/Message</label>
+            <textarea id="wish-input" placeholder="e.g., 2026: Living my best life, chasing dreams, and making every moment count! 🚀" style="height: 90px;"></textarea>
+
+            <label style="display: block; color: var(--primary); font-weight: 600; margin: 15px 0 8px; font-size: 0.95rem;">My 2026 Goals 🎯</label>
+            <textarea id="goals-input" placeholder="Write your top goals for 2026:&#10;• Get fit and healthy&#10;• Learn a new skill&#10;• Travel to 3 new places&#10;• Build my side hustle&#10;• Read 12 books" style="height: 140px;"></textarea>
+
+            <label style="display: block; color: var(--primary); font-weight: 600; margin: 15px 0 8px; font-size: 0.95rem;">Personal Notes 📝</label>
+            <textarea id="notes-input" placeholder="Private notes to your future self:&#10;• Things to remember&#10;• People to connect with&#10;• Habits to build&#10;• Dreams to chase" style="height: 120px;"></textarea>
+
+            <div style="margin: 20px 0; padding: 15px; background: rgba(0, 242, 255, 0.1); border-radius: 12px; border: 1px solid rgba(0, 242, 255, 0.3);">
+                <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.8); margin: 0;">
+                    💡 <strong>Tip:</strong> Bookmark your link and revisit throughout 2026 to track your progress!
+                </p>
+            </div>
+
+            <button class="btn-share" style="position: static; width: 100%; transform: none;" onclick="copyLink()">
+                🔗 Generate My Vision Link
+            </button>
             <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; opacity: 0.5; cursor: pointer;" onclick="closeDrawer()">← Back</p>
         </div>
     </div>
@@ -928,33 +1009,86 @@
     document.body.appendChild(fireworksScript);
 
     // --- 4. DATA LOGIC ---
-    function openDrawer() { document.getElementById('drawer').style.display = 'flex'; }
-    function closeDrawer() { document.getElementById('drawer').style.display = 'none'; }
+    function openDrawer() {
+        document.getElementById('drawer').style.display = 'flex';
+
+        // Check if user has existing data and update button text
+        const hasData = document.getElementById('wish-input').value ||
+                       document.getElementById('goals-input').value ||
+                       document.getElementById('notes-input').value;
+
+        if(hasData) {
+            document.querySelector('.modal h2').innerHTML = '✏️ Edit Your 2026 Vision';
+        } else {
+            document.querySelector('.modal h2').innerHTML = 'Your 2026 Vision ✨';
+        }
+    }
+
+    function closeDrawer() {
+        document.getElementById('drawer').style.display = 'none';
+    }
 
     function copyLink() {
         const wish = document.getElementById('wish-input').value.trim();
-        if (!wish) {
-            alert("✍️ Write your 2026 vision first!");
+        const goals = document.getElementById('goals-input').value.trim();
+        const notes = document.getElementById('notes-input').value.trim();
+
+        if (!wish && !goals && !notes) {
+            alert("✍️ Add at least your main wish, goals, or notes to create your vision board!");
             return;
         }
-        const config = { w: wish, t: currentTheme };
+
+        const config = {
+            w: wish,
+            g: goals,
+            n: notes,
+            t: currentTheme,
+            d: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        };
         const base64 = btoa(JSON.stringify(config));
         const finalUrl = location.origin + location.pathname + '?v=' + base64;
 
         navigator.clipboard.writeText(finalUrl).then(() => {
             const btn = event.target;
             const originalText = btn.innerText;
-            btn.innerText = "✓ Link Copied!";
+            btn.innerText = "✓ Vision Link Copied!";
             btn.style.background = 'linear-gradient(135deg, #00ff88, #00cc6a)';
 
             setTimeout(() => {
                 btn.innerText = originalText;
                 btn.style.background = "#fff";
                 closeDrawer();
-                alert("🎉 Your custom New Year link is ready to share!");
+
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(135deg, #00f2ff, #00cc6a);
+                    color: #000;
+                    padding: 20px 30px;
+                    border-radius: 15px;
+                    font-weight: 700;
+                    z-index: 10001;
+                    box-shadow: 0 10px 40px rgba(0, 242, 255, 0.5);
+                    animation: slideDown 0.3s ease;
+                    text-align: center;
+                `;
+                successMsg.innerHTML = `
+                    🎉 Your 2026 Vision Link is Ready!<br>
+                    <span style="font-size: 0.9rem; font-weight: 400; opacity: 0.9;">Bookmark it and check back all year!</span>
+                `;
+                document.body.appendChild(successMsg);
+
+                setTimeout(() => {
+                    successMsg.style.animation = 'slideUp 0.3s ease';
+                    setTimeout(() => successMsg.remove(), 300);
+                }, 3000);
             }, 1500);
         }).catch(() => {
-            alert("✅ Link copied! Share your 2026 vibes!");
+            alert("✅ Vision link copied! Bookmark it and revisit throughout 2026!");
             closeDrawer();
         });
     }
@@ -964,16 +1098,60 @@
         if (p) {
             try {
                 const config = JSON.parse(atob(p));
+
+                // Set theme
                 if(config.t) setTheme(config.t);
+
+                // Show main wish
                 if(config.w) {
                     document.getElementById('vibe-val').innerText = config.w;
                     document.getElementById('vibe-pill').style.display = 'block';
                 }
+
+                // Show goals section
+                if(config.g) {
+                    document.getElementById('user-goals-content').innerText = config.g;
+                    document.getElementById('user-goals-section').style.display = 'block';
+                }
+
+                // Show notes section
+                if(config.n) {
+                    document.getElementById('user-notes-content').innerText = config.n;
+                    document.getElementById('user-notes-section').style.display = 'block';
+
+                    // Show save date
+                    if(config.d) {
+                        document.getElementById('saved-date').innerText = config.d;
+                    }
+                }
+
+                // Hide default resolution section when custom content is loaded
+                if(config.w || config.g || config.n) {
+                    document.getElementById('default-resolution-section').style.display = 'none';
+
+                    // Pre-fill the form if they want to edit
+                    document.getElementById('wish-input').value = config.w || '';
+                    document.getElementById('goals-input').value = config.g || '';
+                    document.getElementById('notes-input').value = config.n || '';
+                }
+
             } catch(e) { console.error("Config load error"); }
         }
     }
 
     let celebrationTriggered = false;
+
+    // Check if custom link is loaded
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasCustomLink = urlParams.get('v');
+
+    // Update button text if user loaded their custom link
+    if(hasCustomLink) {
+        setTimeout(() => {
+            const btnText = document.getElementById('btn-text');
+            if(btnText) btnText.innerHTML = '✏️ Edit My Vision';
+        }, 500);
+    }
 
     // TEST MODE: Set countdown to 1 minute from page load
     const testCountdownDate = new Date(Date.now() + 60000).getTime(); // Current time + 1 minute
