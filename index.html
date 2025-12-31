@@ -47,7 +47,7 @@
             transition: 0.5s ease;
         }
 
-        .timer-grid { display: flex; gap: 12px; pointer-events: auto; }
+        .timer-grid { display: flex; gap: 12px; pointer-events: auto; flex-wrap: wrap; justify-content: center; }
         .box { 
             background: var(--glass); 
             backdrop-filter: blur(20px); 
@@ -65,20 +65,34 @@
         /* Control Panel */
         .top-ctrl { position: fixed; top: 25px; left: 25px; display: flex; flex-direction: column; gap: 15px; pointer-events: auto; z-index: 100; }
         .ctrl-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); transition: 0.3s; color: white; }
+        .ctrl-btn:hover { border-color: var(--primary); box-shadow: 0 0 15px var(--primary); }
         .ctrl-btn:active { transform: scale(0.9); }
 
-        .btn-share { 
-            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); 
-            pointer-events: auto; background: #fff; color: #000; padding: 18px 45px; 
-            border-radius: 100px; font-weight: 700; border: none; cursor: pointer; 
+        .btn-share {
+            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+            pointer-events: auto; background: #fff; color: #000; padding: 18px 45px;
+            border-radius: 100px; font-weight: 700; border: none; cursor: pointer;
             text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            z-index: 100;
+            z-index: 100; transition: all 0.3s ease;
         }
+        .btn-share:hover { transform: translateX(-50%) translateY(-3px); box-shadow: 0 15px 50px rgba(255,255,255,0.3); }
+        .btn-share:active { transform: translateX(-50%) translateY(-1px); }
 
         /* Customize Drawer */
-        .drawer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; pointer-events: auto; }
+        .drawer {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+            padding: 20px; pointer-events: auto; animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .modal { background: #0a0a0c; width: 100%; max-width: 400px; padding: 35px; border-radius: 35px; border: 1px solid var(--primary); text-align: left; }
-        textarea { width: 100%; height: 110px; background: #18181b; border: 1px solid #333; border-radius: 15px; color: #fff; padding: 15px; margin: 15px 0; font-family: inherit; font-size: 1rem; outline: none; }
+        textarea {
+            width: 100%; height: 110px; background: #18181b; border: 1px solid #333;
+            border-radius: 15px; color: #fff; padding: 15px; margin: 15px 0;
+            font-family: inherit; font-size: 1rem; outline: none; resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        textarea:focus { border-color: var(--primary); }
         
         #vibe-pill { margin-top: 30px; padding: 10px 20px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid var(--primary); display: none; font-weight: 300; italic; animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -126,14 +140,17 @@
 
 <script>
     // --- 1. SOUND ENGINE ---
-    const sndWhoosh = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
-    const sndBurst  = new Audio('https://assets.mixkit.co/active_storage/sfx/1998/1998-preview.mp3');
-    const sndPad    = new Audio('https://assets.mixkit.co/active_storage/sfx/1157/1157-preview.mp3'); // Dreamy loop
-    
+    // Softer, more pleasant sound alternatives
+    const sndWhoosh = new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3'); // Gentler whoosh
+    const sndBurst  = new Audio('https://assets.mixkit.co/active_storage/sfx/1646/1646-preview.mp3'); // Magical sparkle
+    const sndPad    = new Audio('https://assets.mixkit.co/active_storage/sfx/2906/2906-preview.mp3'); // Ambient ethereal pad
+    const sndChime  = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); // Soft celebration chime
+
     sndPad.loop = true;
-    sndPad.volume = 0.2;
-    sndWhoosh.volume = 0.12;
-    sndBurst.volume  = 0.15;
+    sndPad.volume = 0.15;  // Reduced for subtlety
+    sndWhoosh.volume = 0.08;  // Much softer
+    sndBurst.volume  = 0.1;   // Softer burst
+    sndChime.volume  = 0.12;
 
     let isMuted = false;
     let audioStarted = false;
@@ -142,19 +159,20 @@
     function playFireworkSound(force = false) {
         if (isMuted || !audioStarted) return;
         const now = Date.now();
-        if (!force && now - lastSoundTime < 150) return;
-        if (!force && Math.random() < 0.3) return; // Natural variance
+        if (!force && now - lastSoundTime < 200) return;  // Longer delay between sounds
+        if (!force && Math.random() < 0.4) return; // More selective (less frequent)
 
         lastSoundTime = now;
-        sndWhoosh.playbackRate = 0.8 + Math.random() * 0.4;
-        sndBurst.playbackRate  = 0.9 + Math.random() * 0.2;
-        
+        sndWhoosh.playbackRate = 0.9 + Math.random() * 0.3;  // Less pitch variation
+        sndBurst.playbackRate  = 0.95 + Math.random() * 0.15;
+
         const w = sndWhoosh.cloneNode();
         const b = sndBurst.cloneNode();
-        w.volume = 0.12; b.volume = 0.15;
+        w.volume = 0.08;  // Softer volumes
+        b.volume = 0.1;
 
         w.play();
-        setTimeout(() => b.play(), 60 + Math.random() * 40);
+        setTimeout(() => b.play(), 80 + Math.random() * 60);  // Slightly longer delay for smoother effect
     }
 
     function toggleMute() {
@@ -196,13 +214,25 @@
             this.sx = sx; this.sy = sy;
             this.alpha = 1; this.fade = fade;
             this.gravity = 0.1; this.size = size;
+            this.glow = Math.random() > 0.7;  // Some particles glow
         }
         draw() {
             ctx.globalAlpha = this.alpha;
+
+            // Add glow effect to some particles
+            if (this.glow) {
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+            }
+
             ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fill();
+
+            if (this.glow) {
+                ctx.shadowBlur = 0;
+            }
         }
         update() {
             this.sx *= 0.97; this.sy *= 0.97;
@@ -217,11 +247,14 @@
         playFireworkSound(!isAuto);
         const palette = palettes[currentTheme];
         const color = palette[Math.floor(Math.random() * palette.length)];
-        const count = 70;
+        const count = isAuto ? 50 : 80;  // More particles for manual clicks
+        const maxVelocity = isAuto ? 7 : 10;
+
         for (let i = 0; i < count; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const velocity = Math.random() * 9;
-            particles.push(new Particle(x, y, color, Math.cos(angle) * velocity, Math.sin(angle) * velocity));
+            const velocity = Math.random() * maxVelocity;
+            const size = 1 + Math.random() * 1.5;  // Variable sizes
+            particles.push(new Particle(x, y, color, Math.cos(angle) * velocity, Math.sin(angle) * velocity, 0.015, size));
         }
     }
 
@@ -232,7 +265,8 @@
         particles = particles.filter(p => p.alpha > 0);
         particles.forEach(p => { p.update(); p.draw(); });
 
-        if (Math.random() < 0.03 && audioStarted) {
+        // Reduced auto-burst frequency for less chaos
+        if (Math.random() < 0.015 && audioStarted) {
             createBurst(Math.random() * canvas.width, Math.random() * canvas.height * 0.7, true);
         }
         requestAnimationFrame(loop);
@@ -244,10 +278,10 @@
         createBurst(e.clientX, e.clientY); 
     });
     
-    // Trail Flare
+    // Trail Flare - reduced frequency
     canvas.addEventListener('mousemove', (e) => {
-        if(audioStarted && Math.random() < 0.2) 
-            particles.push(new Particle(e.clientX, e.clientY, palettes[currentTheme][0], (Math.random()-0.5), (Math.random()-0.5), 0.05, 1));
+        if(audioStarted && Math.random() < 0.12)
+            particles.push(new Particle(e.clientX, e.clientY, palettes[currentTheme][0], (Math.random()-0.5), (Math.random()-0.5), 0.06, 0.8));
     });
 
     canvas.width = innerWidth; canvas.height = innerHeight;
@@ -258,14 +292,37 @@
     function closeDrawer() { document.getElementById('drawer').style.display = 'none'; }
 
     function copyLink() {
-        const wish = document.getElementById('wish-input').value;
+        const wish = document.getElementById('wish-input').value.trim();
+        if (!wish) {
+            alert("Please write a wish first!");
+            return;
+        }
         const config = { w: wish, t: currentTheme };
         const base64 = btoa(JSON.stringify(config));
         const finalUrl = location.origin + location.pathname + '?v=' + base64;
-        
-        navigator.clipboard.writeText(finalUrl);
-        alert("Personalized engine link copied to clipboard!");
-        closeDrawer();
+
+        navigator.clipboard.writeText(finalUrl).then(() => {
+            // Success feedback
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "✓ Copied!";
+            btn.style.background = palettes[currentTheme][0];
+            btn.style.color = "#000";
+
+            // Celebration burst
+            createBurst(canvas.width / 2, canvas.height / 2);
+            if (!isMuted && audioStarted) sndChime.play();
+
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#fff";
+                btn.style.color = "#000";
+                closeDrawer();
+            }, 1500);
+        }).catch(() => {
+            alert("Personalized engine link copied to clipboard!");
+            closeDrawer();
+        });
     }
 
     function checkURL() {
@@ -282,12 +339,36 @@
         }
     }
 
+    let celebrationTriggered = false;
+
     function timer() {
-        const diff = new Date("2026-01-01T00:00:00").getTime() - Date.now();
+        const diff = new Date("2026-01-01T00:00:00+05:30").getTime() - Date.now();  // IST timezone
         if (diff <= 0) {
-            document.getElementById('main-year').innerText = "HAPPY 2026";
-            document.getElementById('sub-tag').innerText = "LIMITLESS ERA START";
-            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+            if (!celebrationTriggered) {
+                celebrationTriggered = true;
+                document.getElementById('main-year').innerText = "HAPPY 2026";
+                document.getElementById('sub-tag').innerText = "LIMITLESS ERA BEGINS";
+
+                // Epic celebration sequence
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: palettes[currentTheme] });
+                setTimeout(() => confetti({ particleCount: 100, spread: 90, origin: { y: 0.7 }, colors: palettes[currentTheme] }), 300);
+                setTimeout(() => confetti({ particleCount: 120, spread: 60, origin: { y: 0.5 }, colors: palettes[currentTheme] }), 600);
+
+                // Play celebration chime
+                if (!isMuted && audioStarted) {
+                    sndChime.play();
+                }
+
+                // Massive firework burst
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        createBurst(Math.random() * canvas.width, Math.random() * canvas.height * 0.6, false);
+                    }, i * 250);
+                }
+            }
+            document.getElementById('h').innerText = "00";
+            document.getElementById('m').innerText = "00";
+            document.getElementById('s').innerText = "00";
             return;
         }
         document.getElementById('h').innerText = String(Math.floor((diff/1000/60/60)%24)).padStart(2,'0');
