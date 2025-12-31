@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>2026 | The Next Chapter</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00f2ff;
+            --gold: #ffd700;
+            --bg: #030308;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- Animated Cinematic Background --- */
+        #nebula-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            filter: blur(80px);
+            opacity: 0.6;
+        }
+
+        .stars-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg) 100%);
+            z-index: 1;
+        }
+
+        /* --- Main Content --- */
+        .wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 15vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 0.9;
+            margin-bottom: 10px;
+            background: linear-gradient(to bottom, #fff 30%, rgba(255,255,255,0.2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.2));
+        }
+
+        .subtitle {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 0.8rem;
+            margin-bottom: 40px;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        /* --- Bento Countdown --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .timer-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 25px 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .timer-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .val {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .lbl {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.5;
+        }
+
+        /* --- Personal Message Area --- */
+        .message-box {
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 3px solid var(--gold);
+            text-align: left;
+            display: none;
+        }
+
+        .message-box p {
+            font-weight: 300;
+            line-height: 1.6;
+            color: #eee;
+        }
+
+        /* --- Modern Controls --- */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 18px;
+            border-radius: 50px;
+            border: none;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: #fff;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* --- Customization Drawer --- */
+        .drawer {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: #0a0a0f;
+            z-index: 100;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            padding: 40px 25px;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid var(--accent);
+        }
+
+        .drawer.active { bottom: 0; }
+
+        .drawer textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            font-family: inherit;
+            resize: none;
+            margin: 15px 0;
+        }
+
+        /* --- New Year Mode --- */
+        .celebrate .hero-title {
+            animation: pulse 1s infinite alternate;
+            background: linear-gradient(to bottom, var(--gold), #fff);
+            -webkit-background-clip: text;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); filter: brightness(1); }
+            to { transform: scale(1.05); filter: brightness(1.5); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="nebula-canvas"></canvas>
+    <div class="stars-overlay"></div>
+
+    <div class="wrapper">
+        <div id="countdown-ui">
+            <h1 class="hero-title">2026</h1>
+            <p class="subtitle" id="status-text">Countdown to Genesis</p>
+
+            <div class="bento-grid">
+                <div class="timer-card">
+                    <span class="val" id="d">00</span>
+                    <span class="lbl">Days</span>
+                </div>
+                <div class="timer-card">
+                    <span class="val" id="h">00</span>
+                    <span class="lbl">Hours</span>
+                </div>
+                <div class="timer-card">
+                    <span class="val" id="m">00</span>
+                    <span class="lbl">Mins</span>
+                </div>
+                <div class="timer-card">
+                    <span class="val" id="s">00</span>
+                    <span class="lbl">Secs</span>
+                </div>
+            </div>
+
+            <div class="message-box" id="msg-display">
+                <p id="msg-text"></p>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="toggleDrawer()">✨ Customize</button>
+                <button class="btn btn-secondary" onclick="share()">📤 Share</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="drawer" id="drawer">
+        <h2 style="margin-bottom: 10px;">Personalize</h2>
+        <p style="opacity: 0.5; font-size: 0.8rem;">Write a wish for 2026 to include in your link.</p>
+        <textarea id="custom-msg-input" rows="4" placeholder="May this year bring you endless light and peace..."></textarea>
+        <button class="btn btn-primary" style="width: 100%;" onclick="applyCustomization()">Generate Link</button>
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="toggleDrawer()">Close</button>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        const targetDate = new Date('January 1, 2026 00:00:00').getTime();
+        let isCelebration = false;
+
+        // --- 2. THE TIMER ---
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                if (!isCelebration) startCelebration();
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('d').innerText = String(days).padStart(2, '0');
+            document.getElementById('h').innerText = String(hours).padStart(2, '0');
+            document.getElementById('m').innerText = String(mins).padStart(2, '0');
+            document.getElementById('s').innerText = String(secs).padStart(2, '0');
+        }
+
+        setInterval(updateTimer, 1000);
+
+        // --- 3. NEBULA BACKGROUND ENGINE ---
+        const canvas = document.getElementById('nebula-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            for(let i=0; i<5; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 300 + 200,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    color: i % 2 === 0 ? '#00f2ff' : '#7000ff'
+                });
+            }
+        }
+
+        function drawNebula() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                let grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+                grad.addColorStop(0, p.color);
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                ctx.fill();
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            });
+            requestAnimationFrame(drawNebula);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        drawNebula();
+
+        // --- 4. CUSTOMIZATION & SHARING ---
+        function toggleDrawer() {
+            document.getElementById('drawer').classList.toggle('active');
+        }
+
+        function applyCustomization() {
+            const msg = document.getElementById('custom-msg-input').value;
+            if(!msg) return alert("Write something first!");
+            
+            const encodedMsg = btoa(unescape(encodeURIComponent(msg)));
+            const newURL = window.location.origin + window.location.pathname + '?vibe=' + encodedMsg;
+            
+            // Show result
+            navigator.clipboard.writeText(newURL);
+            alert("Magic Link copied to clipboard! Share it with the world. 🌍");
+            toggleDrawer();
+            
+            // Preview locally
+            displayCustomMessage(msg);
+        }
+
+        function displayCustomMessage(msg) {
+            if(msg) {
+                document.getElementById('msg-text').innerText = msg;
+                document.getElementById('msg-display').style.display = 'block';
+            }
+        }
+
+        // Check for URL parameters on load
+        const params = new URLSearchParams(window.location.search);
+        const vibe = params.get('vibe');
+        if(vibe) {
+            try {
+                const decoded = decodeURIComponent(escape(atob(vibe)));
+                displayCustomMessage(decoded);
+            } catch(e) {}
+        }
+
+        function share() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'New Year 2026',
+                    text: 'Witness the beginning of 2026 with me.',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert("Link copied!");
+            }
+        }
+
+        // --- 5. THE BIG MOMENT ---
+        function startCelebration() {
+            isCelebration = true;
+            document.body.classList.add('celebrate');
+            document.getElementById('status-text').innerText = "WE HAVE ARRIVED";
+            
+            const duration = 15 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+            }, 250);
+        }
+    </script>
+</body>
+</html>
