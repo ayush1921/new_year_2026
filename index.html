@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>2026 | New Year Vibes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0015">
+    <meta name="description" content="Welcome 2026 with style! Interactive New Year countdown with stunning fireworks and personalized wishes.">
+    <title>2026 | New Year Vibes ✨</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&family=Unbounded:wght@600;900&display=swap');
 
@@ -38,8 +42,15 @@
             overflow-x: hidden;
             overflow-y: auto;
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             font-family: var(--font-main);
             position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            height: -webkit-fill-available;
         }
 
         body::before {
@@ -152,6 +163,7 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .box::before {
@@ -234,30 +246,95 @@
         }
 
         .btn-share {
-            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
-            pointer-events: auto; background: #fff; color: #000; padding: 18px 45px;
-            border-radius: 100px; font-weight: 700; border: none; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            z-index: 100; transition: all 0.3s ease;
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: auto;
+            background: #fff;
+            color: #000;
+            padding: 18px 45px;
+            border-radius: 100px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 100;
+            transition: all 0.3s ease;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-main);
         }
-        .btn-share:hover { transform: translateX(-50%) translateY(-3px); box-shadow: 0 15px 50px rgba(255,255,255,0.3); }
-        .btn-share:active { transform: translateX(-50%) translateY(-1px); }
+        .btn-share:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 15px 50px rgba(255,255,255,0.3);
+        }
+        .btn-share:active {
+            transform: translateX(-50%) scale(0.98);
+        }
 
         /* Customize Drawer */
         .drawer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
-            display: none; align-items: center; justify-content: center; z-index: 1000;
-            padding: 20px; pointer-events: auto; animation: fadeIn 0.3s ease;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            pointer-events: auto;
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal { background: #0a0a0c; width: 100%; max-width: 400px; padding: 35px; border-radius: 35px; border: 1px solid var(--primary); text-align: left; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: #0a0a0c;
+            width: 100%;
+            max-width: 450px;
+            padding: 35px;
+            border-radius: 35px;
+            border: 1px solid var(--primary);
+            text-align: left;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
         textarea {
-            width: 100%; height: 110px; background: #18181b; border: 1px solid #333;
-            border-radius: 15px; color: #fff; padding: 15px; margin: 15px 0;
-            font-family: inherit; font-size: 1rem; outline: none; resize: vertical;
+            width: 100%;
+            height: 120px;
+            background: #18181b;
+            border: 2px solid #333;
+            border-radius: 15px;
+            color: #fff;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            resize: vertical;
             transition: border-color 0.3s ease;
+            -webkit-appearance: none;
         }
-        textarea:focus { border-color: var(--primary); }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.1);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
         
         #vibe-pill {
             margin-top: 30px;
@@ -379,12 +456,18 @@
             border-radius: 20px;
             border: 2px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
+            touch-action: manipulation;
+            cursor: pointer;
         }
 
         .feature-card:hover {
             transform: translateY(-10px);
             border-color: var(--primary);
             box-shadow: 0 10px 40px rgba(0, 242, 255, 0.3);
+        }
+
+        .feature-card:active {
+            transform: translateY(-5px);
         }
 
         .feature-icon {
@@ -406,14 +489,294 @@
             line-height: 1.6;
         }
 
+        /* Mobile Optimizations */
         @media (max-width: 768px) {
+            .ui {
+                padding: 20px 15px 100px;
+            }
+
+            .header {
+                margin-top: 30px;
+                margin-bottom: 2rem;
+            }
+
+            .tagline {
+                font-size: 0.85rem;
+                letter-spacing: 2px;
+                margin-bottom: 10px;
+            }
+
+            .year {
+                font-size: clamp(4.5rem, 20vw, 7rem);
+                letter-spacing: -4px;
+            }
+
+            .year::before {
+                font-size: 2rem;
+                top: -20px;
+                right: -10px;
+            }
+
+            #sub-tag {
+                font-size: 0.7rem !important;
+                letter-spacing: 3px;
+            }
+
+            .timer-grid {
+                gap: 10px;
+                margin-bottom: 40px;
+            }
+
+            .box {
+                min-width: clamp(70px, 28vw, 95px);
+                padding: 18px 8px;
+                border-radius: 18px;
+            }
+
+            .box .val {
+                font-size: clamp(2.2rem, 7vw, 3rem);
+            }
+
+            .box .lbl {
+                font-size: 0.6rem;
+                letter-spacing: 1.5px;
+            }
+
             .content-section {
                 margin: 40px 15px;
                 padding: 30px 20px;
+                border-radius: 25px;
+            }
+
+            .section-title {
+                font-size: clamp(1.5rem, 6vw, 2rem);
+                margin-bottom: 20px;
+            }
+
+            .wishes-text {
+                font-size: clamp(1rem, 3.5vw, 1.2rem);
+                line-height: 1.7;
             }
 
             .features-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .feature-card {
+                padding: 25px 18px;
+                border-radius: 18px;
+            }
+
+            .feature-icon {
+                font-size: 2.5rem;
+                margin-bottom: 12px;
+            }
+
+            .feature-title {
+                font-size: 1.1rem;
+            }
+
+            .feature-desc {
+                font-size: 0.9rem;
+            }
+
+            .emoji-float {
+                font-size: clamp(2rem, 6vw, 3rem);
+            }
+
+            .orb {
+                filter: blur(40px);
+                opacity: 0.15;
+            }
+
+            /* Mobile control panel */
+            .top-ctrl {
+                top: 15px;
+                left: 15px;
+                gap: 12px;
+            }
+
+            .ctrl-btn {
+                width: 42px;
+                height: 42px;
+                border-width: 2px;
+            }
+
+            /* Mobile share button */
+            .btn-share {
+                bottom: 20px;
+                padding: 16px 35px;
+                font-size: 0.95rem;
+                border-radius: 80px;
+            }
+
+            /* Mobile modal */
+            .modal {
+                padding: 30px 25px;
+                border-radius: 25px;
+                max-width: 90%;
+            }
+
+            .modal h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal p {
+                font-size: 0.85rem;
+            }
+
+            textarea {
+                height: 100px;
+                font-size: 0.95rem;
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            #vibe-pill {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                margin-top: 25px;
+            }
+        }
+
+        /* Small mobile phones */
+        @media (max-width: 480px) {
+            .ui {
+                padding: 15px 12px 90px;
+            }
+
+            .header {
+                margin-top: 20px;
+            }
+
+            .year {
+                font-size: clamp(3.5rem, 18vw, 5rem);
+            }
+
+            .timer-grid {
+                gap: 8px;
+            }
+
+            .box {
+                min-width: clamp(65px, 28vw, 85px);
+                padding: 15px 6px;
+            }
+
+            .box .val {
+                font-size: clamp(2rem, 7vw, 2.5rem);
+            }
+
+            .content-section {
+                margin: 30px 10px;
+                padding: 25px 18px;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+            }
+
+            .wishes-text {
+                font-size: 0.95rem;
+            }
+
+            .feature-card {
+                padding: 20px 15px;
+            }
+
+            .btn-share {
+                padding: 14px 30px;
+                font-size: 0.9rem;
+            }
+
+            .modal {
+                padding: 25px 20px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 900px) and (orientation: landscape) {
+            .ui {
+                padding: 15px 20px 80px;
+            }
+
+            .header {
+                margin-top: 20px;
+                margin-bottom: 1.5rem;
+            }
+
+            .year {
+                font-size: clamp(3.5rem, 15vw, 6rem);
+            }
+
+            .timer-grid {
+                margin-bottom: 30px;
+            }
+
+            .content-section {
+                margin: 30px auto;
+                padding: 25px 30px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+
+            .emoji-float {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Tablet optimizations */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .ui {
+                padding: 30px 25px 100px;
+            }
+
+            .year {
+                font-size: clamp(7rem, 18vw, 10rem);
+            }
+
+            .content-section {
+                max-width: 750px;
+                padding: 35px 30px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .box {
+                min-width: 100px;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .ctrl-btn,
+            .btn-share,
+            .feature-card {
+                -webkit-tap-highlight-color: rgba(0, 242, 255, 0.2);
+            }
+
+            .box:hover,
+            .feature-card:hover,
+            .ctrl-btn:hover {
+                transform: none;
+            }
+
+            .box:active {
+                transform: scale(0.98);
+            }
+
+            .feature-card:active {
+                transform: translateY(-5px);
+            }
+
+            .ctrl-btn:active {
+                transform: scale(0.92);
             }
         }
     </style>
@@ -470,18 +833,18 @@
             </p>
 
             <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-icon">🎯</span>
+                <div class="feature-card" role="article">
+                    <span class="feature-icon" aria-hidden="true">🎯</span>
                     <div class="feature-title">New Goals</div>
                     <div class="feature-desc">Set ambitious targets and crush them one by one</div>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🌟</span>
+                <div class="feature-card" role="article">
+                    <span class="feature-icon" aria-hidden="true">🌟</span>
                     <div class="feature-title">Fresh Start</div>
                     <div class="feature-desc">Reinvent yourself and become the best version</div>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🔥</span>
+                <div class="feature-card" role="article">
+                    <span class="feature-icon" aria-hidden="true">🔥</span>
                     <div class="feature-title">Pure Vibes</div>
                     <div class="feature-desc">Surround yourself with positive energy</div>
                 </div>
