@@ -1,0 +1,49 @@
+📝 EXAMPLE CUSTOM WISH LINKS
+================================
+
+To test the custom wish feature, try these example links:
+
+1. PERSONALIZED WISH FOR A FRIEND:
+   Copy this and paste in browser address bar:
+   index.html?code=eyJmcm9tIjoiU2FyYWgiLCJ0byI6IkFsZXgiLCJtZXNzYWdlIjoiV2lzaGluZyB5b3UgYW4gaW5jcmVkaWJsZSAyMDI2IGZpbGxlZCB3aXRoIGFkdmVudHVyZXMsIGxhdWdodGVyLCBhbmQgYWxsIHRoZSBzdWNjZXNzIHlvdSBkZXNlcnZlISBMZXQncyBtYWtlIGFtYXppbmcgbWVtb3JpZXMgdG9nZXRoZXIhIiwidGltZXN0YW1wIjoxNzM1NjcyMDAwMDAwfQ==
+
+   This shows:
+   - From: Sarah
+   - To: Alex
+   - Message: "Wishing you an incredible 2026 filled with adventures, laughter, and all the success you deserve! Let's make amazing memories together!"
+
+2. GENERAL WISH (NO RECIPIENT):
+   Copy this and paste in browser address bar:
+   index.html?code=eyJmcm9tIjoiSm9obiIsInRvIjoiIiwibWVzc2FnZSI6IkhhcHB5IE5ldyBZZWFyIGV2ZXJ5b25lISBNYXkgMjAyNiBicmluZyB1cyBhbGwgam95LCBzdWNjZXNzLCBhbmQgY291bnRsZXNzIHJlYXNvbnMgdG8gY2VsZWJyYXRlLiBIZXJlJ3MgdG8gbmV3IGJlZ2lubmluZ3MhIiwidGltZXN0YW1wIjoxNzM1NjcyMDAwMDAwfQ==
+
+   This shows:
+   - From: John
+   - To: (blank - for everyone)
+   - Message: "Happy New Year everyone! May 2026 bring us all joy, success, and countless reasons to celebrate. Here's to new beginnings!"
+
+3. CREATE YOUR OWN:
+   - Open index.html in your browser
+   - Click "✨ Customize & Share" button
+   - Fill in your details:
+     * From: Your name (required)
+     * To: Recipient name (optional - leave blank for everyone)
+     * Message: Your personalized wish (required)
+   - Click "🔗 Generate Link"
+   - Click "📋 Copy" to copy your unique link
+   - Share with friends and family!
+
+TIPS:
+- The "To" field is completely optional
+- Leave "To" blank for general/public wishes
+- Message can be up to 500 characters
+- Each link is unique and shareable
+- Links work on all devices: computers, tablets, and phones
+- Perfect for WhatsApp, SMS, email, or social media!
+
+MOBILE TESTING:
+- Open on iPhone, Android phone, or tablet
+- Interface is fully touch-optimized
+- Buttons are minimum 50px for easy tapping
+- Modal is scrollable on small screens
+- Works in both portrait and landscape
+- No zoom on iOS when typing (16px minimum font size)

@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1f">
     <title>New Year 2026 Countdown</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -13,16 +16,23 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #0a0a1f 0%, #1a0a2e 50%, #16213e 100%);
             color: #fff;
             overflow-x: hidden;
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            height: -webkit-fill-available;
         }
 
         /* Animated background canvas */
@@ -196,6 +206,15 @@
             z-index: 100;
             animation: bounce 2s ease-in-out infinite;
             cursor: pointer;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        @media (max-width: 768px) {
+            .click-instruction {
+                font-size: 0.85rem;
+                bottom: 20px;
+            }
         }
 
         @keyframes bounce {
@@ -255,6 +274,9 @@
             letter-spacing: 1px;
             transition: all 0.3s ease;
             box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            min-height: 50px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .share-btn:hover {
@@ -346,14 +368,26 @@
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 12px 15px;
+            padding: 15px 18px;
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(255, 215, 0, 0.3);
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-family: inherit;
             transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        /* Better touch targets for mobile */
+        @media (hover: none) and (pointer: coarse) {
+            .form-group input,
+            .form-group textarea {
+                padding: 18px 20px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                min-height: 50px;
+            }
         }
 
         .form-group input:focus,
@@ -376,8 +410,18 @@
             flex-wrap: wrap;
         }
 
+        .main-buttons {
+            gap: 12px;
+        }
+
+        .main-buttons .share-btn {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
         .modal-btn {
-            padding: 12px 30px;
+            padding: 15px 35px;
             font-size: 1rem;
             background: linear-gradient(45deg, #ffd700, #ffed4e);
             color: #0a0a1f;
@@ -389,6 +433,9 @@
             letter-spacing: 1px;
             transition: all 0.3s ease;
             box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            min-height: 50px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .modal-btn:hover {
@@ -418,7 +465,7 @@
         }
 
         .copy-btn {
-            padding: 12px 25px;
+            padding: 15px 30px;
             background: #ffd700;
             color: #0a0a1f;
             border: none;
@@ -426,6 +473,10 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
+            min-height: 50px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
         }
 
         .copy-btn:hover {
@@ -433,23 +484,181 @@
             transform: scale(1.05);
         }
 
-        @media (max-width: 768px) {
+        /* Tablet styles */
+        @media (max-width: 1024px) and (min-width: 769px) {
             .modal-content {
-                padding: 30px 20px;
-                margin: 10% auto;
+                padding: 35px 30px;
+                max-width: 700px;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                font-size: 1.1rem;
+                padding: 16px 20px;
+            }
+
+            .modal-btn {
+                padding: 16px 40px;
+                font-size: 1.05rem;
+            }
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .modal {
+                align-items: flex-start;
+                padding: 10px;
+            }
+
+            .modal-content {
+                padding: 25px 20px;
+                margin: 5vh auto 2vh;
+                width: 95%;
+                max-height: 90vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .modal-content h2 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            .close-modal {
+                font-size: 30px;
+                padding: 5px;
+                margin: -5px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                font-size: 1rem;
+                margin-bottom: 8px;
+            }
+
+            .form-group textarea {
+                min-height: 120px;
             }
 
             .button-group {
                 flex-direction: column;
+                gap: 12px;
+            }
+
+            .modal-btn {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 0.95rem;
             }
 
             .share-btn {
                 margin-left: 0 !important;
                 margin-top: 10px;
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 1rem;
             }
 
             .link-box {
                 flex-direction: column;
+                gap: 12px;
+            }
+
+            .link-box input {
+                font-size: 0.85rem;
+                padding: 14px 12px;
+            }
+
+            .copy-btn {
+                width: 100%;
+                padding: 16px;
+                font-size: 1rem;
+            }
+
+            .wishes {
+                padding: 20px 15px;
+                margin: 30px 10px;
+            }
+
+            .wishes p {
+                font-size: 1rem;
+            }
+
+            .button-group {
+                margin-top: 25px;
+                gap: 10px;
+            }
+
+            .main-buttons {
+                flex-direction: column;
+            }
+
+            .main-buttons .share-btn {
+                max-width: 100%;
+            }
+        }
+
+        /* Small mobile phones */
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 20px 15px;
+                width: 98%;
+            }
+
+            .modal-content h2 {
+                font-size: 1.3rem;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 14px 16px;
+            }
+
+            .modal-btn,
+            .share-btn {
+                font-size: 0.9rem;
+                padding: 14px 16px;
+                letter-spacing: 0.5px;
+            }
+
+            .link-box input {
+                font-size: 0.8rem;
+            }
+
+            #shareable-link-container p {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .modal-content {
+                margin: 2vh auto;
+                max-height: 95vh;
+                padding: 15px;
+            }
+
+            .modal-content h2 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                margin-bottom: 5px;
+                font-size: 0.95rem;
+            }
+
+            .form-group textarea {
+                min-height: 80px;
+                rows: 3;
             }
         }
     </style>
@@ -536,9 +745,9 @@
                 </p>
             </div>
 
-            <div class="button-group" style="margin-top: 30px;">
-                <button class="share-btn" onclick="openCustomizeModal()">Customize & Share</button>
-                <button class="share-btn" onclick="shareWishes()" style="margin-left: 10px;">Quick Share</button>
+            <div class="button-group main-buttons" style="margin-top: 30px;">
+                <button class="share-btn" onclick="openCustomizeModal()">✨ Customize & Share</button>
+                <button class="share-btn" onclick="shareWishes()">📤 Quick Share</button>
             </div>
         </div>
     </div>
@@ -563,26 +772,29 @@
             <h2>🎨 Customize Your New Year Wishes</h2>
             <div class="form-group">
                 <label>From (Your Name):</label>
-                <input type="text" id="from-name" placeholder="Enter your name" maxlength="50">
+                <input type="text" id="from-name" placeholder="e.g., John Smith" maxlength="50">
             </div>
             <div class="form-group">
-                <label>To (Recipient's Name):</label>
-                <input type="text" id="to-name" placeholder="Enter recipient's name" maxlength="50">
+                <label>To (Optional):</label>
+                <input type="text" id="to-name" placeholder="e.g., Sarah (Leave blank for everyone)" maxlength="50">
             </div>
             <div class="form-group">
-                <label>Custom Message:</label>
-                <textarea id="custom-message" placeholder="Enter your personalized New Year message..." rows="4" maxlength="300"></textarea>
+                <label>Your New Year Message:</label>
+                <textarea id="custom-message" placeholder="Write your personalized New Year wishes here..." rows="5" maxlength="500"></textarea>
             </div>
             <div class="button-group">
-                <button class="modal-btn preview-btn" onclick="previewCustomization()">Preview</button>
-                <button class="modal-btn generate-btn" onclick="generateShareableLink()">Generate Link</button>
+                <button class="modal-btn preview-btn" onclick="previewCustomization()">👁️ Preview</button>
+                <button class="modal-btn generate-btn" onclick="generateShareableLink()">🔗 Generate Link</button>
             </div>
             <div id="shareable-link-container" style="display: none;">
                 <p style="color: #ffd700; margin-top: 20px;">Your shareable link:</p>
                 <div class="link-box">
-                    <input type="text" id="shareable-link" readonly>
-                    <button class="copy-btn" onclick="copyShareableLink()">Copy</button>
+                    <input type="text" id="shareable-link" readonly onclick="this.select()">
+                    <button class="copy-btn" onclick="copyShareableLink()">📋 Copy</button>
                 </div>
+                <p style="color: #d4af37; font-size: 0.9rem; margin-top: 10px; text-align: center;">
+                    Share this link with friends and family!
+                </p>
             </div>
         </div>
     </div>
@@ -618,20 +830,28 @@
         }
 
         function displayCustomWish() {
-            if (customWishData.to) {
+            // Show "Dear [Name]" only if recipient is specified
+            if (customWishData.to && customWishData.to.trim()) {
                 document.getElementById('custom-wish-header').style.display = 'block';
                 document.getElementById('to-name-display').textContent = customWishData.to;
+            } else {
+                document.getElementById('custom-wish-header').style.display = 'none';
             }
 
-            if (customWishData.message) {
+            if (customWishData.message && customWishData.message.trim()) {
                 document.getElementById('default-wishes').style.display = 'none';
                 document.getElementById('custom-message-display').style.display = 'block';
                 document.getElementById('custom-message-display').querySelector('p').textContent = customWishData.message;
+            } else {
+                document.getElementById('default-wishes').style.display = 'block';
+                document.getElementById('custom-message-display').style.display = 'none';
             }
 
-            if (customWishData.from) {
+            if (customWishData.from && customWishData.from.trim()) {
                 document.getElementById('from-name-display').style.display = 'block';
                 document.getElementById('from-name-text').textContent = customWishData.from;
+            } else {
+                document.getElementById('from-name-display').style.display = 'none';
             }
         }
 
@@ -654,14 +874,14 @@
             const toName = document.getElementById('to-name').value.trim();
             const message = document.getElementById('custom-message').value.trim();
 
-            if (!fromName && !toName && !message) {
-                alert('Please fill in at least one field to preview!');
+            if (!fromName && !message) {
+                alert('Please enter your name and a message to preview!');
                 return;
             }
 
             customWishData = {
                 from: fromName,
-                to: toName,
+                to: toName, // Can be empty
                 message: message,
                 code: ''
             };
@@ -671,6 +891,16 @@
 
             // Trigger confetti for preview
             randomConfetti();
+
+            // Scroll to wishes section on mobile
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    document.querySelector('.wishes').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 300);
+            }
         }
 
         function generateShareableLink() {
@@ -678,15 +908,15 @@
             const toName = document.getElementById('to-name').value.trim();
             const message = document.getElementById('custom-message').value.trim();
 
-            if (!fromName && !toName && !message) {
-                alert('Please fill in at least one field to generate a link!');
+            if (!fromName && !message) {
+                alert('Please enter your name and a message to generate a link!');
                 return;
             }
 
             // Create unique code
             const data = {
                 from: fromName,
-                to: toName,
+                to: toName, // Can be empty
                 message: message,
                 timestamp: Date.now()
             };
@@ -701,6 +931,16 @@
 
             // Update local data
             customWishData = { ...data, code: encoded };
+
+            // Scroll to link on mobile
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    document.getElementById('shareable-link-container').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                }, 100);
+            }
         }
 
         function copyShareableLink() {
