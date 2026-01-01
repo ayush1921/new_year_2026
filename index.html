@@ -1229,14 +1229,13 @@
 
     if (TEST_MODE) {
         // TEST MODE: Quick demo of all three phases
-        // Phase 1: Countdown (60 seconds)
-        countdownDate = new Date(Date.now() + 60000).getTime(); // 1 minute from now
-        // Phase 2: Celebration (30 seconds after countdown ends)
-        jan2Date = new Date(countdownDate + 30000).getTime(); // 30 seconds celebration
-        console.log("🧪 TEST MODE ACTIVE - Timeline:");
-        console.log("   ⏳ Countdown ends in: 60 seconds");
-        console.log("   🎉 Celebration mode: 30 seconds (from 1:00 to 1:30)");
-        console.log("   ⏱️  Count-up mode starts: after 1:30");
+        // Simulate we're already 3 days into 2026 for count-up demo
+        countdownDate = new Date(Date.now() - (3 * 24 * 60 * 60 * 1000)).getTime(); // 3 days ago
+        jan2Date = new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).getTime(); // 2 days ago
+        console.log("🧪 TEST MODE ACTIVE - Count-up Demo:");
+        console.log("   Simulating: 3 days into 2026");
+        console.log("   You should see: 'DAY 3 INTO THE FUTURE'");
+        console.log("   Timer shows: Hours:Minutes:Seconds of current day");
 
         // Show test mode indicator
         const testBadge = document.createElement('div');
