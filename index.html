@@ -1221,23 +1221,38 @@
     }
 
     // ===== TEST MODE TOGGLE =====
-    // Set to true for testing, false for production
-    const TEST_MODE = false;
+    // Options: false (production), 'countdown', 'celebration', 'countup'
+    const TEST_MODE = 'countup';
 
     // Countdown to New Year 2026 (January 1, 2026 00:00:00 IST)
     let countdownDate, jan2Date;
 
-    if (TEST_MODE) {
-        // TEST MODE: Quick demo of all three phases
-        // Simulate we're already 3 days into 2026 for count-up demo
-        countdownDate = new Date(Date.now() - (3 * 24 * 60 * 60 * 1000)).getTime(); // 3 days ago
-        jan2Date = new Date(Date.now() - (2 * 24 * 60 * 60 * 1000)).getTime(); // 2 days ago
-        console.log("🧪 TEST MODE ACTIVE - Count-up Demo:");
-        console.log("   Simulating: 3 days into 2026");
-        console.log("   You should see: 'DAY 3 INTO THE FUTURE'");
-        console.log("   Timer shows: Hours:Minutes:Seconds of current day");
+    if (TEST_MODE === 'countdown') {
+        // Test countdown mode (1 minute countdown)
+        countdownDate = new Date(Date.now() + 60000).getTime();
+        jan2Date = new Date(countdownDate + 30000).getTime();
+        console.log("🧪 TEST: COUNTDOWN MODE - Watch timer count down for 60 seconds");
+        showTestBadge('COUNTDOWN');
+    } else if (TEST_MODE === 'celebration') {
+        // Test celebration mode (shows HAPPY 2026)
+        countdownDate = new Date(Date.now() - 60000).getTime(); // 1 min ago
+        jan2Date = new Date(Date.now() + 60000).getTime(); // 1 min from now
+        console.log("🧪 TEST: CELEBRATION MODE - Should show 'HAPPY 2026' and 00:00:00");
+        showTestBadge('CELEBRATION');
+    } else if (TEST_MODE === 'countup') {
+        // Test count-up mode (simulate day 5 of 2026)
+        countdownDate = new Date(Date.now() - (5 * 24 * 60 * 60 * 1000)).getTime();
+        jan2Date = new Date(Date.now() - (4 * 24 * 60 * 60 * 1000)).getTime();
+        console.log("🧪 TEST: COUNT-UP MODE - Should show 'DAY 5 INTO THE FUTURE'");
+        console.log("   Timer shows time elapsed today (your current time)");
+        showTestBadge('COUNT-UP');
+    } else {
+        // PRODUCTION MODE: Real New Year dates
+        countdownDate = new Date("2026-01-01T00:00:00+05:30").getTime();
+        jan2Date = new Date("2026-01-02T00:00:00+05:30").getTime();
+    }
 
-        // Show test mode indicator
+    function showTestBadge(mode) {
         const testBadge = document.createElement('div');
         testBadge.style.cssText = `
             position: fixed;
@@ -1254,12 +1269,8 @@
             pointer-events: none;
             letter-spacing: 1px;
         `;
-        testBadge.innerHTML = '🧪 TEST MODE';
+        testBadge.innerHTML = `🧪 TEST: ${mode}`;
         document.body.appendChild(testBadge);
-    } else {
-        // PRODUCTION MODE: Real New Year dates
-        countdownDate = new Date("2026-01-01T00:00:00+05:30").getTime();
-        jan2Date = new Date("2026-01-02T00:00:00+05:30").getTime();
     }
 
     function timer() {
