@@ -369,8 +369,6 @@
             50% { transform: translateY(-12px); }
         }
 
-        .mute-active { opacity: 0.4; filter: grayscale(1); }
-
         /* Glowing orbs */
         .orb {
             position: fixed;
@@ -852,7 +850,6 @@
         <div class="ctrl-btn" style="background: linear-gradient(135deg, #00f2ff, #007a99);" onclick="setTheme('cyber')" title="Cyber"></div>
         <div class="ctrl-btn" style="background: linear-gradient(135deg, #ffd700, #aa8800);" onclick="setTheme('royal')" title="Royal"></div>
         <div class="ctrl-btn" style="background: linear-gradient(135deg, #9d00ff, #5500aa);" onclick="setTheme('cosmic')" title="Cosmic"></div>
-        <div class="ctrl-btn" id="mute-trigger" onclick="toggleMute()" title="Toggle Sound">🔊</div>
     </div>
 
     <div class="ui">
@@ -965,49 +962,7 @@
     </div>
 
 <script>
-    // --- 1. SOUND ENGINE (ff.html library will handle this) ---
-    let isMuted = false;
-    let audioStarted = false;
-
-    function toggleMute() {
-        isMuted = !isMuted;
-        document.getElementById('mute-trigger').innerText = isMuted ? '🔇' : '🔊';
-        document.getElementById('mute-trigger').classList.toggle('mute-active', isMuted);
-
-        // Mute/unmute the fireworks library
-        if (window.soundEnabled !== undefined) {
-            window.soundEnabled = !isMuted;
-        }
-    }
-
-    function startAudioContext() {
-        if (!audioStarted) {
-            audioStarted = true;
-            console.log('🔊 Audio enabled! Fireworks will now play sounds.');
-
-            // Enable sound in the fireworks library if it supports it
-            if (window.soundEnabled !== undefined) {
-                window.soundEnabled = !isMuted;
-            }
-
-            // Try to initialize any Web Audio context that might exist
-            if (window.AudioContext || window.webkitAudioContext) {
-                try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    const audioCtx = new AudioContext();
-                    audioCtx.resume();
-                } catch (e) {
-                    // Silent fail - library will handle its own audio
-                }
-            }
-        }
-    }
-
-    // Enable audio on first interaction (click or touch)
-    document.addEventListener('click', startAudioContext, { once: true });
-    document.addEventListener('touchstart', startAudioContext, { once: true });
-
-    // --- 2. THEMES & URLS ---
+    // --- 1. THEMES & URLS ---
     let currentTheme = 'royal';
     const palettes = {
         cyber: ['#00f2ff', '#ff007a', '#ffffff'],
@@ -1021,61 +976,22 @@
         document.documentElement.style.setProperty('--primary', palettes[t][0]);
     }
 
-    // --- 3. FIREWORKS ENGINE (using ff.html library) ---
-    // The ff.html fireworks library will handle all visual and sound effects
+    // --- 2. FIREWORKS ENGINE (visual effects only) ---
     const fireworksScript = document.createElement('script');
     fireworksScript.src = 'https://cdn.jsdelivr.net/gh/cdn25/fireworks/v.2.1.js';
     fireworksScript.onload = function() {
         console.log('🎆 Fireworks library loaded successfully!');
-        // Show sound activation hint
-        showSoundHint();
+        // Disable sound in the library
+        if (window.soundEnabled !== undefined) {
+            window.soundEnabled = false;
+        }
     };
     fireworksScript.onerror = function() {
         console.error('Failed to load fireworks library');
     };
     document.body.appendChild(fireworksScript);
 
-    // Show sound activation hint to user
-    function showSoundHint() {
-        const hint = document.createElement('div');
-        hint.id = 'sound-hint';
-        hint.style.cssText = `
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 242, 255, 0.95);
-            color: #000;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            z-index: 10000;
-            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.4);
-            animation: fadeIn 0.3s ease;
-            pointer-events: none;
-        `;
-        hint.innerHTML = '🔊 Click anywhere to enable sound effects!';
-        document.body.appendChild(hint);
-
-        // Remove hint after first interaction
-        const removeHint = () => {
-            if (hint && hint.parentNode) {
-                hint.style.animation = 'fadeOut 0.3s ease';
-                setTimeout(() => hint.remove(), 300);
-            }
-            document.removeEventListener('click', removeHint);
-            document.removeEventListener('touchstart', removeHint);
-        };
-
-        document.addEventListener('click', removeHint, { once: true });
-        document.addEventListener('touchstart', removeHint, { once: true });
-
-        // Auto-hide after 5 seconds
-        setTimeout(removeHint, 5000);
-    }
-
-    // --- 4. DATA LOGIC ---
+    // --- 3. DATA LOGIC ---
     function openDrawer() {
         document.getElementById('drawer').style.display = 'flex';
 
